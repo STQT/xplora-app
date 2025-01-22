@@ -1,8 +1,60 @@
 import 'package:flutter/material.dart';
+import 'package:dropdown_search/dropdown_search.dart';
 import '../widgets/progress_indicator.dart';
-import '../widgets/chips_input.dart';
 
-class CompleteProfileStep2 extends StatelessWidget {
+class CompleteProfileStep2 extends StatefulWidget {
+  @override
+  _CompleteProfileStep2State createState() => _CompleteProfileStep2State();
+}
+
+class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
+  final TextEditingController bioController = TextEditingController();
+
+  bool isFormValid = false;
+  List<String> selectedInterests = [];
+  List<String> selectedLanguages = [];
+
+  List<String> allInterests = [
+    "Sports",
+    "Music",
+    "Technology",
+    "Art",
+    "Traveling",
+    "Gaming",
+    "Cooking",
+  ];
+
+  List<String> allLanguages = [
+    "English",
+    "Spanish",
+    "French",
+    "German",
+    "Russian",
+    "Chinese",
+    "Japanese",
+    "Arabic",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    bioController.addListener(_validateForm);
+  }
+
+  @override
+  void dispose() {
+    bioController.dispose();
+    super.dispose();
+  }
+
+  void _validateForm() {
+    setState(() {
+      isFormValid = selectedInterests.isNotEmpty &&
+          selectedLanguages.isNotEmpty &&
+          bioController.text.isNotEmpty;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -17,51 +69,210 @@ class CompleteProfileStep2 extends StatelessWidget {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Text(
-              "Complete your profile",
-              style: TextStyle(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
+            // Header with underline
+            Align(
+              alignment: Alignment.center,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  RichText(
+                    text: TextSpan(
+                      style: TextStyle(
+                        fontFamily: 'Fira Sans Condensed',
+                        fontStyle: FontStyle.normal,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 24,
+                        height: 1.0,
+                        color: Color(0xFF121414),
+                      ),
+                      children: [
+                        TextSpan(text: "Complete your "),
+                        TextSpan(
+                          text: "profile",
+                          style: TextStyle(color: Color(0xFF121414)),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Positioned(
+                    bottom: -5,
+                    left: 150, // Adjust underline alignment relative to text
+                    child: Container(
+                      width: 65,
+                      height: 8,
+                      color: Color(0xFF58C4B6),
+                    ),
+                  ),
+                ],
               ),
             ),
+
             SizedBox(height: 8),
-            Text(
-              "Tell us a bit more about yourself!",
-              style: TextStyle(
-                fontSize: 16,
-                color: Colors.black54,
-              ),
-            ),
-            SizedBox(height: 24),
-            ChipsInput(label: "Your interests"),
-            SizedBox(height: 16),
-            ChipsInput(label: "Languages"),
-            SizedBox(height: 16),
-            TextField(
-              decoration: InputDecoration(
-                labelText: "Bio",
-              ),
-              maxLines: 3,
-            ),
-            Spacer(),
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushNamed(context, '/step3');
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Color(0xFF4CAF93),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            Align(
+              alignment: Alignment.center,
+              child: Text(
+                "Let’s start with some basic information!",
+                style: TextStyle(
+                  fontFamily: 'Fira Sans Condensed',
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w400,
+                  fontSize: 16,
+                  height: 1.25,
+                  color: Color(0xFF797C7B),
                 ),
               ),
-              child: Text("Complete form"),
+            ),
+            SizedBox(height: 86),
+            // Searchable Dropdown for Interests
+            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+              Text(
+                "Interests",
+                style: TextStyle(
+                  fontFamily: 'Fira Sans Condensed',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF24786D),
+                ),
+              ),
+
+              SizedBox(height: 8),
+              DropdownSearch<String>.multiSelection(
+                items: allInterests,
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                  dropdownSearchDecoration: InputDecoration(
+                    hintText: "Search and select interests",
+                    filled: true,
+                    fillColor: Color(0xFFE7EBED),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  ),
+                ),
+                popupProps: PopupPropsMultiSelection.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    decoration: InputDecoration(
+                      hintText: "Type to search interests",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ),
+                onChanged: (List<String> value) {
+                  setState(() {
+                    selectedInterests = value;
+                  });
+                  _validateForm();
+                },
+                selectedItems: selectedInterests,
+              ),
+              SizedBox(height: 16),
+              // Searchable Dropdown for Languages
+              Text(
+                "Languages",
+                style: TextStyle(
+                  fontFamily: 'Fira Sans Condensed',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF24786D),
+                ),
+              ),
+              SizedBox(height: 8),
+              DropdownSearch<String>.multiSelection(
+                items: allLanguages,
+                dropdownDecoratorProps: DropDownDecoratorProps(
+                  dropdownSearchDecoration: InputDecoration(
+                    hintText: "Search and select languages",
+                    filled: true,
+                    fillColor: Color(0xFFE7EBED),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                      borderSide: BorderSide.none,
+                    ),
+                    contentPadding:
+                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  ),
+                ),
+                popupProps: PopupPropsMultiSelection.menu(
+                  showSearchBox: true,
+                  searchFieldProps: TextFieldProps(
+                    decoration: InputDecoration(
+                      hintText: "Type to search languages",
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                  ),
+                ),
+                onChanged: (List<String> value) {
+                  setState(() {
+                    selectedLanguages = value;
+                  });
+                  _validateForm();
+                },
+                selectedItems: selectedLanguages,
+              ),
+              SizedBox(height: 16),
+              // Bio Input
+              TextField(
+                controller: bioController,
+                decoration: InputDecoration(
+                  labelText: "Bio",
+                  labelStyle: TextStyle(
+                    fontFamily: 'Fira Sans Condensed',
+                    fontSize: 16,
+                    fontWeight: FontWeight.w400,
+                    color: Color(0xFF24786D),
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(color: Color(0xFFE0E0E0)),
+                  ),
+                  focusedBorder: UnderlineInputBorder(
+                    borderSide:
+                        BorderSide(color: Color(0xFF54A59B), width: 2.0),
+                  ),
+                ),
+                maxLines: 3,
+              ),
+            ]),
+            Spacer(),
+            // Complete Button
+            ElevatedButton(
+              onPressed: isFormValid
+                  ? () {
+                      Navigator.pushNamed(context, '/step3');
+                    }
+                  : null,
+              style: ElevatedButton.styleFrom(
+                backgroundColor:
+                    isFormValid ? Color(0xFF4CAF93) : Color(0xFFE0E0E0),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                fixedSize: Size(327, 48),
+                elevation: 0,
+              ),
+              child: Text(
+                isFormValid ? "Complete form" : "Complete",
+                style: TextStyle(
+                  fontFamily: 'Fira Sans Condensed',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: isFormValid ? Color(0xFFFFFFFF) : Color(0xFFBDBDBD),
+                ),
+              ),
             ),
             SizedBox(height: 16),
             ProfileProgressIndicator(step: 2),
+            SizedBox(height: 16),
           ],
         ),
       ),
