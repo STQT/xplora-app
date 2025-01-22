@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:dropdown_search/dropdown_search.dart';
+import '../widgets/chips_input.dart';
 import '../widgets/progress_indicator.dart';
 
 class CompleteProfileStep2 extends StatefulWidget {
@@ -100,7 +100,7 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                   ),
                   Positioned(
                     bottom: -5,
-                    left: 150, // Adjust underline alignment relative to text
+                    left: 150,
                     child: Container(
                       width: 65,
                       height: 8,
@@ -110,7 +110,6 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                 ],
               ),
             ),
-
             SizedBox(height: 8),
             Align(
               alignment: Alignment.center,
@@ -127,133 +126,63 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
               ),
             ),
             SizedBox(height: 86),
-            // Searchable Dropdown for Interests
-            Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              Text(
-                "Interests",
-                style: TextStyle(
+            // ChipsInput for Interests
+            ChipsInput(
+              label: "Interests",
+              options: allInterests,
+              selectedItems: selectedInterests,
+              onChanged: (value) {
+                setState(() {
+                  selectedInterests = value;
+                });
+                _validateForm();
+              },
+            ),
+            SizedBox(height: 16),
+            // ChipsInput for Languages
+            ChipsInput(
+              label: "Languages",
+              options: allLanguages,
+              selectedItems: selectedLanguages,
+              onChanged: (value) {
+                setState(() {
+                  selectedLanguages = value;
+                });
+                _validateForm();
+              },
+            ),
+            SizedBox(height: 16),
+            // Bio Input
+            TextField(
+              controller: bioController,
+              decoration: InputDecoration(
+                labelText: "Bio",
+                labelStyle: TextStyle(
                   fontFamily: 'Fira Sans Condensed',
                   fontSize: 16,
                   fontWeight: FontWeight.w400,
                   color: Color(0xFF24786D),
                 ),
-              ),
-
-              SizedBox(height: 8),
-              DropdownSearch<String>.multiSelection(
-                items: allInterests,
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(
-                    hintText: "Search and select interests",
-                    filled: true,
-                    fillColor: Color(0xFFE7EBED),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFFE0E0E0)),
                 ),
-                popupProps: PopupPropsMultiSelection.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                      hintText: "Type to search interests",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ),
-                onChanged: (List<String> value) {
-                  setState(() {
-                    selectedInterests = value;
-                  });
-                  _validateForm();
-                },
-                selectedItems: selectedInterests,
-              ),
-              SizedBox(height: 16),
-              // Searchable Dropdown for Languages
-              Text(
-                "Languages",
-                style: TextStyle(
-                  fontFamily: 'Fira Sans Condensed',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF24786D),
+                focusedBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(color: Color(0xFF54A59B), width: 2.0),
                 ),
               ),
-              SizedBox(height: 8),
-              DropdownSearch<String>.multiSelection(
-                items: allLanguages,
-                dropdownDecoratorProps: DropDownDecoratorProps(
-                  dropdownSearchDecoration: InputDecoration(
-                    hintText: "Search and select languages",
-                    filled: true,
-                    fillColor: Color(0xFFE7EBED),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding:
-                        EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                  ),
-                ),
-                popupProps: PopupPropsMultiSelection.menu(
-                  showSearchBox: true,
-                  searchFieldProps: TextFieldProps(
-                    decoration: InputDecoration(
-                      hintText: "Type to search languages",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                  ),
-                ),
-                onChanged: (List<String> value) {
-                  setState(() {
-                    selectedLanguages = value;
-                  });
-                  _validateForm();
-                },
-                selectedItems: selectedLanguages,
-              ),
-              SizedBox(height: 16),
-              // Bio Input
-              TextField(
-                controller: bioController,
-                decoration: InputDecoration(
-                  labelText: "Bio",
-                  labelStyle: TextStyle(
-                    fontFamily: 'Fira Sans Condensed',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF24786D),
-                  ),
-                  enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Color(0xFFE0E0E0)),
-                  ),
-                  focusedBorder: UnderlineInputBorder(
-                    borderSide:
-                        BorderSide(color: Color(0xFF54A59B), width: 2.0),
-                  ),
-                ),
-                maxLines: 3,
-              ),
-            ]),
+              maxLines: 3,
+            ),
             Spacer(),
             // Complete Button
             ElevatedButton(
               onPressed: isFormValid
                   ? () {
-                      Navigator.pushNamed(context, '/step3');
-                    }
+                Navigator.pushNamed(context, '/step3');
+              }
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                    isFormValid ? Color(0xFF4CAF93) : Color(0xFFE0E0E0),
+                isFormValid ? Color(0xFF4CAF93) : Color(0xFFE0E0E0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                 ),
