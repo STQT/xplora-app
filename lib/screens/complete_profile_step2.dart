@@ -69,7 +69,7 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        padding: const EdgeInsets.symmetric(horizontal: 20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
@@ -171,6 +171,13 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                 ),
               ),
               maxLines: 3,
+              textInputAction: TextInputAction.done, // Устанавливаем действие кнопки "Done"
+              onSubmitted: (value) {
+                // Действие при нажатии "Return" или "Done"
+                FocusScope.of(context).unfocus(); // Скрыть клавиатуру
+                // Здесь можно также добавить логику сохранения, если необходимо
+                print("Bio submitted: $value");
+              },
             ),
             Spacer(),
             // Complete Button

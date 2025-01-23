@@ -232,6 +232,7 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
                 clipBehavior: Clip.antiAlias,
                 child: Stack(
                   children: [
+                    // Background Image
                     Image.network(
                       person['image']!,
                       height: double.infinity,
@@ -247,16 +248,34 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
                         );
                       },
                     ),
+                    // Gradient Overlay
+                    Align(
+                      alignment: Alignment.bottomCenter,
+                      child: Container(
+                        height: 150, // Высота градиента
+                        decoration: BoxDecoration(
+                          gradient: LinearGradient(
+                            colors: [
+                              Colors.transparent,
+                              Colors.black.withOpacity(0.8),
+                            ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
+                        ),
+                      ),
+                    ),
+                    // Text Information
                     Align(
                       alignment: Alignment.bottomLeft,
-                      child: Container(
-                        color: Colors.black.withOpacity(0.01),
-                        padding: EdgeInsets.all(16),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          "${person['name']}, ${person['age']}",
+                          "${person['name']}, ${person['age']}\n"
+                              "${person['location']}",
                           style: TextStyle(
                             color: Colors.white,
-                            fontSize: 24,
+                            fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -279,6 +298,7 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
       ),
     );
   }
+
 
   Widget _buildDetailView(BuildContext context) {
     final person = people[currentIndex];

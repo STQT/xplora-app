@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'match_screen_people.dart';
 import 'match_screen_events.dart';
+
 class MatchScreen extends StatefulWidget {
   @override
   _MatchScreenState createState() => _MatchScreenState();
@@ -58,6 +59,7 @@ class _MatchScreenState extends State<MatchScreen>
       ),
       body: TabBarView(
         controller: _tabController,
+        physics: NeverScrollableScrollPhysics(), // Отключаем свайп между вкладками
         children: [
           MatchScreenPeople(), // Tab for "People"
           MatchScreenEvents(), // Tab for "Events"
@@ -91,4 +93,3 @@ class _MatchScreenState extends State<MatchScreen>
     );
   }
 }
-
