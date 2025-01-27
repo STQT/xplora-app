@@ -17,12 +17,13 @@ class DiscoveriaApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       initialRoute: '/',
       routes: {
-        '/': (context) => WelcomeScreen(),
+        '/': (context) => MatchScreen(),
+        '/welcome': (context) => WelcomeScreen(),
         '/login': (context) => LoginScreen(),
         '/step1': (context) => CompleteProfileStep1(),
         '/step2': (context) => CompleteProfileStep2(),
         '/step3': (context) => CompleteProfileStep3(),
-        '/match': (context) => MatchScreen(),
+
       },
     );
   }

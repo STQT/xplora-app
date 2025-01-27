@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'match_screen_people.dart';
-import 'match_screen_events.dart';
+import 'events/match_screen_events.dart';
 
 class MatchScreen extends StatefulWidget {
   @override
