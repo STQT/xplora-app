@@ -50,7 +50,7 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                   SizedBox(height: 40),
                   Padding(
-                    padding: const EdgeInsets.only(left: 100.0), // Добавлен отступ слева
+                    padding: const EdgeInsets.only(left: 60.0), // Добавлен отступ слева
                     child: Align(
                       alignment: Alignment.centerLeft, // Выравнивание по левому краю
                       child: RichText(
