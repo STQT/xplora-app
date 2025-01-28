@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:discoveria/components/bottom_nav_bar.dart';
 
 class ProfileScreen extends StatelessWidget {
@@ -6,14 +7,216 @@ class ProfileScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return ScaffoldWithAnimation(
       child: Scaffold(
-        appBar: AppBar(
-          title: Text("Profile"),
-          backgroundColor: Colors.transparent,
-          elevation: 0,
+        appBar: PreferredSize(
+          preferredSize: Size.fromHeight(10), // Высота AppBar 10px
+          child: AppBar(
+            automaticallyImplyLeading: false,
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
         ),
-        body: Center(child: Text("Profile Content Here")),
-        bottomNavigationBar: CustomBottomNavBar(currentIndex: 2),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              // Profile Image
+              CircleAvatar(
+                radius: 50,
+                backgroundImage: NetworkImage(
+                  'https://picsum.photos/200?random=1', // Реальная картинка пользователя
+                ),
+              ),
+              SizedBox(height: 10),
+              // Name & Username
+              Text(
+                "Alex Linderson",
+                style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Fira Sans Condensed',
+                ),
+              ),
+              Text(
+                "@alexlind",
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.teal,
+                  fontFamily: 'Fira Sans Condensed',
+                ),
+              ),
+              SizedBox(height: 20),
+
+              // Interests
+              _buildSection("Interests", ["Yoga", "Shopping", "Hiking"]),
+              _buildSection("Languages", ["English", "French"]),
+              _buildBioSection(),
+              _buildPlacesVisited(),
+
+              SizedBox(height: 20),
+            ],
+          ),
+        ),
+        bottomNavigationBar:
+            CustomBottomNavBar(currentIndex: 2), // Активный таб — "Profile"
       ),
+    );
+  }
+
+  // Виджет для разделов "Interests" и "Languages"
+  Widget _buildSection(String title, List<String> items) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                title,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Fira Sans Condensed',
+                ),
+              ),
+              SizedBox(width: 6),
+              SvgPicture.asset(
+                "assets/icons/edit.svg",
+                width: 18,
+                height: 18,
+                color: Colors.teal,
+              ),
+            ],
+          ),
+          SizedBox(height: 4),
+          ...items.map((item) => Text(
+                "• $item",
+                style:
+                    TextStyle(fontSize: 14, fontFamily: 'Fira Sans Condensed'),
+              )),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  // Виджет для раздела "Bio"
+  Widget _buildBioSection() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                "Bio",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Fira Sans Condensed',
+                ),
+              ),
+              SizedBox(width: 6),
+              SvgPicture.asset(
+                "assets/icons/edit.svg",
+                width: 18,
+                height: 18,
+                color: Colors.teal,
+              ),
+            ],
+          ),
+          SizedBox(height: 4),
+          Text(
+            "Hi! I’m Alex, a software engineer from the Netherlands. "
+            "I’m heading to LA and would love to meet some locals and fellow tourists. "
+            "\n\nMy instagram is @alexlind and my linkedin is Alex Linderson.",
+            style: TextStyle(fontSize: 14, fontFamily: 'Fira Sans Condensed'),
+          ),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  // Виджет для раздела "Places visited"
+  Widget _buildPlacesVisited() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Text(
+                "Places visited",
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                  fontFamily: 'Fira Sans Condensed',
+                ),
+              ),
+              SizedBox(width: 6),
+              SvgPicture.asset(
+                "assets/icons/edit.svg",
+                width: 18,
+                height: 18,
+                color: Colors.teal,
+              ),
+            ],
+          ),
+          SizedBox(height: 8),
+          Row(
+            children: [
+              _buildPlaceImage("https://picsum.photos/100?random=1"),
+              SizedBox(width: 8),
+              _buildPlaceImage("https://picsum.photos/100?random=2"),
+              SizedBox(width: 8),
+              _buildPlaceImage("https://picsum.photos/100?random=3",
+                  isMore: true),
+            ],
+          ),
+          Divider(),
+        ],
+      ),
+    );
+  }
+
+  // Виджет для изображений посещенных мест
+  Widget _buildPlaceImage(String imageUrl, {bool isMore = false}) {
+    return Stack(
+      alignment: Alignment.center,
+      children: [
+        ClipRRect(
+          borderRadius: BorderRadius.circular(8),
+          child: Image.network(
+            imageUrl,
+            width: 70,
+            height: 70,
+            fit: BoxFit.cover,
+          ),
+        ),
+        if (isMore)
+          Container(
+            width: 70,
+            height: 70,
+            decoration: BoxDecoration(
+              color: Colors.black.withOpacity(0.6),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Center(
+              child: Text(
+                "+10",
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+      ],
     );
   }
 }
