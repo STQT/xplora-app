@@ -243,5 +243,4 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       controller: TextEditingController(text: selectedDate),
     );
   }
-
 }

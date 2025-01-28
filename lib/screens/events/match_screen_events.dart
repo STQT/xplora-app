@@ -1,3 +1,4 @@
+import 'package:discoveria/screens/events/request_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -22,10 +23,10 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
       "attendees": "200",
       "image": "https://picsum.photos/300?random=1",
     },
-    // Add more events as needed
   ];
 
   final CardSwiperController _swiperController = CardSwiperController();
+  int currentIndex = 0; // Track current event index
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,6 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
         children: [
           Padding(
             padding: const EdgeInsets.only(top: 130.0, bottom: 70.0),
-            // For top and bottom space
             child: Center(
               child: CardSwiper(
                 cardsCount: events.length,
@@ -89,63 +89,60 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                             // Text Information
                             Align(
                               alignment: Alignment.bottomLeft,
-                              child: Align(
-                                alignment: Alignment.bottomLeft,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16.0),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Text(
-                                            event['title']!,
-                                            style: TextStyle(
-                                              fontFamily: 'Fira Sans Condensed',
-                                              color: Colors.white,
-                                              fontSize: 24,
-                                            ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Column(
+                                      crossAxisAlignment:
+                                      CrossAxisAlignment.start,
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Text(
+                                          event['title']!,
+                                          style: TextStyle(
+                                            fontFamily: 'Fira Sans Condensed',
+                                            color: Colors.white,
+                                            fontSize: 24,
                                           ),
-                                          Text(
-                                            "${event['date']}",
-                                            style: TextStyle(
-                                              fontFamily: 'Fira Sans Condensed',
-                                              color: Colors.white,
-                                              fontSize: 20,
-                                            ),
+                                        ),
+                                        Text(
+                                          "${event['date']}",
+                                          style: TextStyle(
+                                            fontFamily: 'Fira Sans Condensed',
+                                            color: Colors.white,
+                                            fontSize: 20,
                                           ),
-                                        ],
-                                      ),
-                                      Column(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.person,
+                                        ),
+                                      ],
+                                    ),
+                                    Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            Icon(
+                                              Icons.person,
+                                              color: Colors.white,
+                                              size: 24,
+                                            ),
+                                            SizedBox(width: 4),
+                                            Text(
+                                              "~${event['attendees']} attendees",
+                                              style: TextStyle(
+                                                fontFamily:
+                                                'Fira Sans Condensed',
                                                 color: Colors.white,
-                                                size: 24,
+                                                fontSize: 20,
                                               ),
-                                              SizedBox(width: 4),
-                                              Text(
-                                                "~${event['attendees']} attendees",
-                                                style: TextStyle(
-                                                  fontFamily:
-                                                      'Fira Sans Condensed',
-                                                  color: Colors.white,
-                                                  fontSize: 20,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ],
-                                  ),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
@@ -157,12 +154,12 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                 },
                 onSwipe: (int index, int? previousIndex,
                     CardSwiperDirection direction) {
-                  // Handle swipe actions if needed
-                  print("Swiped ${direction.name} on index $index");
+                  setState(() {
+                    currentIndex = index; // Update the current index
+                  });
                   return true;
                 },
                 padding: EdgeInsets.zero,
-                // Remove internal padding from CardSwiper
                 scale: 0.9,
               ),
             ),
@@ -175,7 +172,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Кнопка "Create Event"
+                // Create Event Button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -214,9 +211,6 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                     ],
                   ),
                 ),
-                SizedBox(height: 4),
-
-                // Кнопка "Edit Your Events"
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -258,6 +252,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               ],
             ),
           ),
+
           // Request to Join Button
           Align(
             alignment: Alignment.bottomCenter,
@@ -265,8 +260,16 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               padding: const EdgeInsets.only(bottom: 50.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Request to join event logic
-                  showRequestAlert(context);
+                  // Open Request to Join Event Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => RequestToJoinEventScreen(
+                        eventName: events[currentIndex]['title']!,
+                        eventDate: events[currentIndex]['date']!,
+                      ),
+                    ),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Color(0xFF20A090),
@@ -290,86 +293,5 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
         ],
       ),
     );
-  }
-
-  void showRequestAlert(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: true,
-      builder: (BuildContext context) {
-        return Stack(
-          children: [
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.15,
-              left: 20,
-              right: 20,
-              child: Container(
-                height: 77,
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color(0xFF5EBAAE), Color(0xFF24786D)],
-                    begin: Alignment.centerLeft,
-                    end: Alignment.centerRight,
-                  ),
-                  border: Border.all(color: Color(0xFF43D590), width: 1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Icon(Icons.check_circle,
-                          size: 24, color: Colors.white),
-                    ),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(right: 16.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              "Request sent",
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
-                            ),
-                            Text(
-                              "Your request to join has been sent!",
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w400,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    GestureDetector(
-                      onTap: () => Navigator.of(context).pop(),
-                      child: Padding(
-                        padding: const EdgeInsets.all(12.0),
-                        child: Icon(Icons.close, color: Colors.white),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        );
-      },
-    );
-
-    // Auto-dismiss after 2 seconds
-    Future.delayed(Duration(seconds: 2), () {
-      if (Navigator.of(context).canPop()) {
-        Navigator.of(context).pop();
-      }
-    });
   }
 }
