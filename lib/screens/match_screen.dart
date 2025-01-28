@@ -4,6 +4,10 @@ import 'events/match_screen_events.dart';
 import 'package:discoveria/components/bottom_nav_bar.dart';
 
 class MatchScreen extends StatefulWidget {
+  final int initialTabIndex;
+
+  MatchScreen({this.initialTabIndex = 0}); // По умолчанию открывается вкладка "People"
+
   @override
   _MatchScreenState createState() => _MatchScreenState();
 }
@@ -15,7 +19,11 @@ class _MatchScreenState extends State<MatchScreen>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(
+      length: 2,
+      vsync: this,
+      initialIndex: widget.initialTabIndex, // Устанавливаем вкладку при загрузке
+    );
   }
 
   @override
@@ -61,11 +69,10 @@ class _MatchScreenState extends State<MatchScreen>
         ),
         body: TabBarView(
           controller: _tabController,
-          physics: NeverScrollableScrollPhysics(),
-          // Отключаем свайп между вкладками
+          physics: NeverScrollableScrollPhysics(), // Отключаем свайп
           children: [
-            MatchScreenPeople(), // Tab for "People"
-            MatchScreenEvents(), // Tab for "Events"
+            MatchScreenPeople(), // Вкладка "People"
+            MatchScreenEvents(), // Вкладка "Events"
           ],
         ),
         bottomNavigationBar: CustomBottomNavBar(currentIndex: 1),

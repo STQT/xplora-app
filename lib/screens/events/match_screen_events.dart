@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:discoveria/screens/events/create_event.dart';
 
 class MatchScreenEvents extends StatefulWidget {
   @override
@@ -62,7 +63,8 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                                 return Container(
                                   color: Colors.grey,
                                   child: Center(
-                                    child: Icon(Icons.broken_image, size: 50, color: Colors.white),
+                                    child: Icon(Icons.broken_image,
+                                        size: 50, color: Colors.white),
                                   ),
                                 );
                               },
@@ -92,10 +94,12 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                                 child: Padding(
                                   padding: const EdgeInsets.all(16.0),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Column(
-                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         mainAxisSize: MainAxisSize.min,
                                         children: [
                                           Text(
@@ -130,7 +134,8 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                                               Text(
                                                 "~${event['attendees']} attendees",
                                                 style: TextStyle(
-                                                  fontFamily: 'Fira Sans Condensed',
+                                                  fontFamily:
+                                                      'Fira Sans Condensed',
                                                   color: Colors.white,
                                                   fontSize: 20,
                                                 ),
@@ -143,14 +148,12 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                                   ),
                                 ),
                               ),
-
                             ),
                           ],
                         ),
                       ),
                     ),
                   );
-
                 },
                 onSwipe: (int index, int? previousIndex,
                     CardSwiperDirection direction) {
@@ -172,9 +175,14 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Кнопка "Create Event"
                 ElevatedButton(
                   onPressed: () {
-                    // Edit your events logic
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreateEventScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF20A090),
@@ -194,21 +202,28 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                           color: Colors.white,
                         ),
                       ),
-
-                      // SizedBox(width: 4),
-                      Text("Create event",
-                          style: TextStyle(
-                              fontFamily: 'Fira Sans Condensed',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Colors.white)),
+                      Text(
+                        "Create event",
+                        style: TextStyle(
+                          fontFamily: 'Fira Sans Condensed',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
                   ),
                 ),
                 SizedBox(height: 4),
+
+                // Кнопка "Edit Your Events"
                 ElevatedButton(
                   onPressed: () {
-                    // Edit your events logic
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => CreateEventScreen()),
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Color(0xFF20A090),
@@ -228,14 +243,15 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                           color: Colors.white,
                         ),
                       ),
-
-                      // SizedBox(width: 4),
-                      Text("Edit your events",
-                          style: TextStyle(
-                              fontFamily: 'Fira Sans Condensed',
-                              fontWeight: FontWeight.w600,
-                              fontSize: 14,
-                              color: Colors.white)),
+                      Text(
+                        "Edit your events",
+                        style: TextStyle(
+                          fontFamily: 'Fira Sans Condensed',
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
                   ),
                 ),
