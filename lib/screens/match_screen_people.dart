@@ -287,8 +287,11 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
             );
           },
           onSwipe: (int index, int? previousIndex, CardSwiperDirection direction) {
-            if (direction == CardSwiperDirection.left) {
+            if (direction == CardSwiperDirection.right) {
+              print("Liked ${people[index]['name']!}");
               showMessageSentAlert(context, people[index]['name']!);
+            } else if (direction == CardSwiperDirection.left) {
+              print("Skipped ${people[index]['name']!}");
             }
             return true;
           },

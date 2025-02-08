@@ -1,8 +1,8 @@
-import 'package:discoveria/screens/events/request_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:discoveria/screens/events/create_event.dart';
+import 'package:discoveria/screens/events/request_screen.dart';
 
 class MatchScreenEvents extends StatefulWidget {
   @override
@@ -26,7 +26,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
   ];
 
   final CardSwiperController _swiperController = CardSwiperController();
-  int currentIndex = 0; // Track current event index
+  int currentIndex = 0; // ✅ Храним текущий индекс
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +45,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
                     child: AspectRatio(
-                      aspectRatio: 1, // Ensures a square-like aspect ratio
+                      aspectRatio: 1,
                       child: Card(
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16),
@@ -53,7 +53,6 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                         clipBehavior: Clip.antiAlias,
                         child: Stack(
                           children: [
-                            // Background Image
                             Image.network(
                               event['image']!,
                               height: double.infinity,
@@ -69,11 +68,10 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                                 );
                               },
                             ),
-                            // Gradient Overlay
                             Align(
                               alignment: Alignment.bottomCenter,
                               child: Container(
-                                height: 150, // Height of the gradient overlay
+                                height: 150,
                                 decoration: BoxDecoration(
                                   gradient: LinearGradient(
                                     colors: [
@@ -86,7 +84,6 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                                 ),
                               ),
                             ),
-                            // Text Information
                             Align(
                               alignment: Alignment.bottomLeft,
                               child: Padding(
@@ -155,8 +152,22 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                 onSwipe: (int index, int? previousIndex,
                     CardSwiperDirection direction) {
                   setState(() {
-                    currentIndex = index; // Update the current index
+                    currentIndex = index; // ✅ Обновляем индекс при свайпе
                   });
+
+                  if (direction == CardSwiperDirection.right) {
+                    final selectedEvent = events[currentIndex];
+
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RequestToJoinEventScreen(
+                          eventName: selectedEvent['title']!,
+                          eventDate: selectedEvent['date']!,
+                        ),
+                      ),
+                    );
+                  }
                   return true;
                 },
                 padding: EdgeInsets.zero,
@@ -165,14 +176,12 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
             ),
           ),
 
-          // Top Buttons
           Positioned(
             top: 20,
             left: 20,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Create Event Button
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -253,20 +262,20 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
             ),
           ),
 
-          // Request to Join Button
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
               padding: const EdgeInsets.only(bottom: 50.0),
               child: ElevatedButton(
                 onPressed: () {
-                  // Open Request to Join Event Screen
+                  final selectedEvent = events[currentIndex];
+
                   Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => RequestToJoinEventScreen(
-                        eventName: events[currentIndex]['title']!,
-                        eventDate: events[currentIndex]['date']!,
+                        eventName: selectedEvent['title']!,
+                        eventDate: selectedEvent['date']!,
                       ),
                     ),
                   );
