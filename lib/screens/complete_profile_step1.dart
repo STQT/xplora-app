@@ -59,7 +59,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
             SizedBox(height: 8),
             Text(
               "Let’s start with some basic information!",
-              style: _textStyle(fontSize: 16, color: Color(0xFF797C7B)),
+              style: _textStyle(fontSize: 16, color: Color(0xFF77C2C8)),
             ),
             SizedBox(height: 86),
             // Поля ввода
@@ -106,7 +106,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
             child: Container(
               width: 65,
               height: 8,
-              color: Color(0xFF58C4B6),
+              color: Color(0xFF77C2C8),
             ),
           ),
         ],
@@ -160,7 +160,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
       decoration: InputDecoration(
         labelText: "Date of birth",
         labelStyle: _textStyle(fontSize: 16, color: Color(0xFF24786D)),
-        suffixIcon: Icon(Icons.calendar_today, color: Color(0xFF797C7B)),
+        suffixIcon: Icon(Icons.calendar_today, color: Color(0xFF77C2C8)),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFE0E0E0)),
         ),
@@ -191,7 +191,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
           ? () => Navigator.pushNamed(context, '/step2')
           : null,
       style: ElevatedButton.styleFrom(
-        backgroundColor: isFormValid ? Color(0xFF4CAF93) : Color(0xFFE0E0E0),
+        backgroundColor: isFormValid ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(16.0),
         ),

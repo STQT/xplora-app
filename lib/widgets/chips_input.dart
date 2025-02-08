@@ -35,7 +35,7 @@ class ChipsInput extends StatelessWidget {
             dropdownSearchDecoration: InputDecoration(
               hintText: "Select", // Placeholder
               filled: true,
-              fillColor: Color(0xFFE7EBED),
+              fillColor: Color(0xFF88bdc2),
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(8.0),
                 borderSide: BorderSide.none,

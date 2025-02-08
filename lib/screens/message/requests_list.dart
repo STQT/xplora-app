@@ -28,7 +28,7 @@ class RequestsListScreen extends StatelessWidget {
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(request['message']!),
-          trailing: Icon(Icons.remove_red_eye, color: Colors.teal),
+          trailing: Icon(Icons.remove_red_eye, color: Color(0xFF77C2C8)),
           onTap: () {
             // Переход на экран запроса
             Navigator.push(

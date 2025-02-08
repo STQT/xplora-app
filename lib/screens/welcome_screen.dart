@@ -63,7 +63,7 @@ class WelcomeScreen extends StatelessWidget {
                           children: [
                             TextSpan(
                               text: "Travel ",
-                              style: TextStyle(color: Color(0xFF41B2A4)),
+                              style: TextStyle(color: Color(0xFF78BFC5)),
                             ),
                             TextSpan(
                               text: "together,\n",
@@ -71,7 +71,7 @@ class WelcomeScreen extends StatelessWidget {
                             ),
                             TextSpan(
                               text: "Discover ",
-                              style: TextStyle(color: Color(0xFF41B2A4)),
+                              style: TextStyle(color: Color(0xFF78BFC5)),
                             ),
                             TextSpan(
                               text: "together",

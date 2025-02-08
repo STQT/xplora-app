@@ -191,7 +191,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF20A090),
+                    backgroundColor: Color(0xFF77C2C8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -229,7 +229,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF20A090),
+                    backgroundColor: Color(0xFF77C2C8),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
                     ),
@@ -281,7 +281,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF20A090),
+                  backgroundColor: Color(0xFF77C2C8),
                   fixedSize: Size(268, 48),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),

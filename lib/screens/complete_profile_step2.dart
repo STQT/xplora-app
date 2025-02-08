@@ -104,7 +104,7 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                     child: Container(
                       width: 65,
                       height: 8,
-                      color: Color(0xFF58C4B6),
+                      color: Color(0xFF77C2C8),
                     ),
                   ),
                 ],
@@ -121,7 +121,7 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
                   height: 1.25,
-                  color: Color(0xFF797C7B),
+                  color: Color(0xFF77C2C8),
                 ),
               ),
             ),
@@ -189,7 +189,7 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                isFormValid ? Color(0xFF4CAF93) : Color(0xFFE0E0E0),
+                isFormValid ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                 ),

@@ -85,7 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   fontSize: 16,
                   height: 20 / 16,
                   letterSpacing: 0.1,
-                  color: Color(0xFF797C7B),
+                  color: Colors.grey,
                 ),
               ),
               SizedBox(height: 24),

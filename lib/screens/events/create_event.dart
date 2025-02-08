@@ -73,7 +73,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   width: 128,
                   height: 135,
                   decoration: BoxDecoration(
-                    color: Color(0xFF20A090),
+                    color: Color(0xFF77C2C8),
                     border: Border.all(color: Colors.black),
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -130,7 +130,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                   // TODO: Add event creation logic
                 },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Color(0xFF20A090),
+                  backgroundColor: Color(0xFF77C2C8),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16),
                   ),
@@ -158,7 +158,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       decoration: InputDecoration(
         labelText: label,
         labelStyle: TextStyle(
-          color: Colors.teal,
+          color: Color(0xFF77C2C8),
           fontFamily: 'Fira Sans Condensed',
         ),
         border: UnderlineInputBorder(),
@@ -171,7 +171,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       decoration: InputDecoration(
         labelText: "Country",
         labelStyle:
-        TextStyle(color: Colors.teal, fontFamily: 'Fira Sans Condensed'),
+        TextStyle(color: Color(0xFF77C2C8), fontFamily: 'Fira Sans Condensed'),
         border: UnderlineInputBorder(),
       ),
       value: selectedCountry,
@@ -196,7 +196,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       decoration: InputDecoration(
         labelText: "City",
         labelStyle:
-        TextStyle(color: Colors.teal, fontFamily: 'Fira Sans Condensed'),
+        TextStyle(color: Color(0xFF77C2C8), fontFamily: 'Fira Sans Condensed'),
         border: UnderlineInputBorder(),
       ),
       value: selectedCity,
@@ -221,10 +221,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       decoration: InputDecoration(
         labelText: "Date",
         labelStyle: TextStyle(
-          color: Colors.teal,
+          color: Color(0xFF77C2C8),
           fontFamily: 'Fira Sans Condensed',
         ),
-        suffixIcon: Icon(Icons.calendar_today, color: Colors.teal),
+        suffixIcon: Icon(Icons.calendar_today, color: Color(0xFF77C2C8)),
         border: UnderlineInputBorder(),
       ),
       onTap: () async {

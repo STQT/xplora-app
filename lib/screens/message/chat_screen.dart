@@ -110,7 +110,7 @@ class ChatScreen extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             margin: EdgeInsets.symmetric(vertical: 4),
             decoration: BoxDecoration(
-              color: isSender ? Color(0xFF20A090) : Colors.grey.shade200,
+              color: isSender ? Color(0xFF77C2C8) : Colors.grey.shade200,
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(
@@ -140,7 +140,7 @@ class ChatScreen extends StatelessWidget {
         padding: EdgeInsets.all(10),
         margin: EdgeInsets.symmetric(vertical: 4),
         decoration: BoxDecoration(
-          color: Color(0xFF20A090),
+          color: Color(0xFF77C2C8),
           borderRadius: BorderRadius.circular(16),
         ),
         child: Row(

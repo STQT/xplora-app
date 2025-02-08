@@ -86,7 +86,7 @@ class _CompleteProfileStep3State extends State<CompleteProfileStep3> {
                     child: Container(
                       width: 65,
                       height: 8,
-                      color: Color(0xFF58C4B6),
+                      color: Color(0xFF77C2C8),
                     ),
                   ),
                 ],
@@ -103,7 +103,7 @@ class _CompleteProfileStep3State extends State<CompleteProfileStep3> {
                   fontWeight: FontWeight.w400,
                   fontSize: 16,
                   height: 1.25,
-                  color: Color(0xFF797C7B),
+                  color: Color(0xFF77C2C8),
                 ),
               ),
             ),
@@ -257,7 +257,7 @@ class _CompleteProfileStep3State extends State<CompleteProfileStep3> {
                   : null,
               style: ElevatedButton.styleFrom(
                 backgroundColor:
-                selectedCountry != null && selectedCity != null ? Color(0xFF4CAF93) : Color(0xFFE0E0E0),
+                selectedCountry != null && selectedCity != null ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16.0),
                 ),

@@ -40,7 +40,7 @@ class _MatchScreenState extends State<MatchScreen>
           title: Text(
             "Discoveria",
             style: TextStyle(
-              color: Colors.teal,
+              color: Color(0xFF77C2C8),
               fontFamily: 'Fira Sans Condensed',
               fontWeight: FontWeight.bold,
             ),
@@ -52,13 +52,13 @@ class _MatchScreenState extends State<MatchScreen>
             preferredSize: Size.fromHeight(48.0),
             child: TabBar(
               controller: _tabController,
-              indicatorColor: Colors.teal,
+              indicatorColor: Color(0xFF77C2C8),
               labelStyle: TextStyle(
                 fontFamily: 'Fira Sans Condensed',
                 fontWeight: FontWeight.w600,
                 fontSize: 16,
               ),
-              labelColor: Colors.teal,
+              labelColor: Color(0xFF77C2C8),
               unselectedLabelColor: Colors.black54,
               tabs: [
                 Tab(text: "People"),

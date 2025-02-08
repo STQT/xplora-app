@@ -17,7 +17,7 @@ class ProfileProgressIndicator extends StatelessWidget {
           height: 12,
           decoration: BoxDecoration(
             shape: BoxShape.circle,
-            color: index < step ? Color(0xFF4CAF93) : Colors.grey.shade300,
+            color: index < step ? Color(0xFF77C2C8) : Colors.grey.shade300,
           ),
         ),
       ),

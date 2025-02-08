@@ -72,7 +72,7 @@ class RequestScreen extends StatelessWidget {
                 fontFamily: 'Fira Sans Condensed',
                 fontSize: 14,
                 fontWeight: FontWeight.bold,
-                color: Colors.teal,
+                color: Color(0xFF77C2C8),
               ),
             ),
             SizedBox(height: 8),
@@ -117,7 +117,7 @@ class RequestScreen extends StatelessWidget {
                       // Логика принятия
                     },
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.teal,
+                      backgroundColor: Color(0xFF77C2C8),
                       padding: EdgeInsets.symmetric(vertical: 14),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

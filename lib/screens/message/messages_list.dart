@@ -63,7 +63,7 @@ class MessagesListScreen extends StatelessWidget {
                 if (message['unread'] != null)
                   CircleAvatar(
                     radius: 12,
-                    backgroundColor: Colors.teal,
+                    backgroundColor: Color(0xFF77C2C8),
                     child: Text(
                       message['unread']!,
                       style: TextStyle(color: Colors.white, fontSize: 12),

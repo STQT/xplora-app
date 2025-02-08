@@ -46,7 +46,7 @@ class _RequestToJoinEventScreenState extends State<RequestToJoinEventScreen> {
                   TextSpan(text: "Send a message to join "),
                   TextSpan(
                     text: widget.eventName,
-                    style: TextStyle(color: Colors.teal),
+                    style: TextStyle(color: Color(0xFF77C2C8)),
                   ),
                   TextSpan(text: " on ${widget.eventDate}!"),
                 ],
@@ -86,7 +86,7 @@ class _RequestToJoinEventScreenState extends State<RequestToJoinEventScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFF20A090),
+                    backgroundColor: Color(0xFF77C2C8),
                     fixedSize: Size(268, 48),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(16),
