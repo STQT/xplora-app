@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/progress_indicator.dart';
+import '../widgets/fields.dart';
 
 class CompleteProfileStep1 extends StatefulWidget {
   @override
@@ -49,34 +50,36 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            // Заголовок
-            _buildHeader(),
-            SizedBox(height: 8),
-            Text(
-              "Let’s start with some basic information!",
-              style: _textStyle(fontSize: 16, color: Color(0xFF77C2C8)),
-            ),
-            SizedBox(height: 86),
-            // Поля ввода
-            _buildTextField("First Name", firstNameController),
-            SizedBox(height: 16),
-            _buildTextField("Last Name", lastNameController),
-            SizedBox(height: 24),
-            // Поле Gender
-            _buildGenderSection(),
-            SizedBox(height: 16),
-            _buildDatePickerField(),
-            Spacer(),
-            _buildSubmitButton(),
-            SizedBox(height: 16),
-            ProfileProgressIndicator(step: 1),
-            SizedBox(height: 16),
-          ],
+      body: SingleChildScrollView( // ⬅️ Добавили прокрутку, если контент превышает экран
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 24.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ProfileHeader(),
+              SizedBox(height: 8),
+              ProfileDescription(text: "Let’s start with some basic information!"),
+              SizedBox(height: 32),
+
+              CustomTextField(label: "First Name", controller: firstNameController),
+              SizedBox(height: 16),
+              CustomTextField(label: "Last Name", controller: lastNameController),
+              SizedBox(height: 24),
+
+
+              _buildGenderSection(),
+              SizedBox(height: 16),
+              _buildDatePickerField(),
+
+              SizedBox(height: 32), // ⬅️ Добавил отступ перед кнопкой
+
+              _buildSubmitButton(),
+              SizedBox(height: 16),
+
+              ProfileProgressIndicator(step: 1), // ⬅️ Прогресс-бар теперь всегда виден
+              SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );
@@ -106,7 +109,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
             child: Container(
               width: 65,
               height: 8,
-              color: Color(0xFF77C2C8),
+              color: Color(0xFF8AC0C7),
             ),
           ),
         ],
@@ -119,7 +122,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
       controller: controller,
       decoration: InputDecoration(
         labelText: label,
-        labelStyle: _textStyle(fontSize: 16, color: Color(0xFF24786D)),
+        labelStyle: _textStyle(fontSize: 16, color: Color(0xFF8AC0C7)),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFE0E0E0)),
         ),
@@ -134,7 +137,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Gender", style: _textStyle(fontSize: 16, color: Color(0xFF24786D))),
+        Text("Gender", style: _textStyle(fontSize: 16, color: Color(0xFF8AC0C7))),
         SizedBox(height: 16),
         Wrap(
           spacing: 16.0,
@@ -159,8 +162,8 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
       controller: dobController,
       decoration: InputDecoration(
         labelText: "Date of birth",
-        labelStyle: _textStyle(fontSize: 16, color: Color(0xFF24786D)),
-        suffixIcon: Icon(Icons.calendar_today, color: Color(0xFF77C2C8)),
+        labelStyle: _textStyle(fontSize: 16, color: Color(0xFF8AC0C7)),
+        suffixIcon: Icon(Icons.calendar_today, color: Color(0xFF8AC0C7)),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFE0E0E0)),
         ),
@@ -187,9 +190,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
 
   Widget _buildSubmitButton() {
     return ElevatedButton(
-      onPressed: isFormValid
-          ? () => Navigator.pushNamed(context, '/step2')
-          : null,
+      onPressed: isFormValid ? () => Navigator.pushNamed(context, '/step2') : null,
       style: ElevatedButton.styleFrom(
         backgroundColor: isFormValid ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
         shape: RoundedRectangleBorder(
@@ -237,7 +238,7 @@ class GenderRadioButton extends StatelessWidget {
           value: label,
           groupValue: groupValue,
           onChanged: onChanged,
-          fillColor: MaterialStateProperty.all(Color(0xFF54A59B)),
+          fillColor: MaterialStateProperty.all(Color(0xFF8AC0C7)),
         ),
         SizedBox(width: 8),
         Text(

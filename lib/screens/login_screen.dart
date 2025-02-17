@@ -62,7 +62,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                   Text(
-                    "Log in to Discoveria",
+                    "Log in to Xplora",
                     style: TextStyle(
                       fontFamily: 'Fira Sans Condensed',
                       fontStyle: FontStyle.normal,

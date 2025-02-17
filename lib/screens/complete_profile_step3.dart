@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../widgets/progress_indicator.dart';
+import '../widgets/fields.dart';
 
 class CompleteProfileStep3 extends StatefulWidget {
   @override
@@ -33,7 +34,7 @@ class _CompleteProfileStep3State extends State<CompleteProfileStep3> {
     if (pickedDate != null) {
       setState(() {
         controller.text =
-        "${pickedDate.day.toString().padLeft(2, '0')}.${pickedDate.month.toString().padLeft(2, '0')}.${pickedDate.year}";
+            "${pickedDate.day.toString().padLeft(2, '0')}.${pickedDate.month.toString().padLeft(2, '0')}.${pickedDate.year}";
       });
     }
   }
@@ -56,223 +57,61 @@ class _CompleteProfileStep3State extends State<CompleteProfileStep3> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Align(
-              alignment: Alignment.center,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        fontFamily: 'Fira Sans Condensed',
-                        fontStyle: FontStyle.normal,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 24,
-                        height: 1.0,
-                        color: Color(0xFF121414),
-                      ),
-                      children: [
-                        TextSpan(text: "Complete your "),
-                        TextSpan(
-                          text: "profile",
-                          style: TextStyle(color: Color(0xFF121414)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -5,
-                    left: 150,
-                    child: Container(
-                      width: 65,
-                      height: 8,
-                      color: Color(0xFF77C2C8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ProfileHeader(),
             SizedBox(height: 8),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                "Choose your first destination!",
-                style: TextStyle(
-                  fontFamily: 'Fira Sans Condensed',
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  height: 1.25,
-                  color: Color(0xFF77C2C8),
-                ),
-              ),
-            ),
+
+            ProfileDescription(text: "Choose your first destination!"),
             SizedBox(height: 86),
+
+            CustomDropdownField(
+              label: "Country",
+              value: selectedCountry,
+              options: countryCityMap.keys.toList(),
+              onChanged: (value) {
+                setState(() {
+                  selectedCountry = value;
+                  selectedCity = null;
+                  availableCities = countryCityMap[value!] ?? [];
+                });
+              },
+            ),
+            SizedBox(height: 16),
+
             // Dropdowns for Country and City
-            Row(
-              children: [
-                Expanded(
-                  child: Stack(
-                    children: [
-                      DropdownButtonFormField<String>(
-                        value: selectedCountry,
-                        items: countryCityMap.keys
-                            .map((country) => DropdownMenuItem(
-                          value: country,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 40.0),
-                            child: Text(
-                              country,
-                              style: TextStyle(
-                                fontFamily: 'Fira Sans Condensed',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF121414),
-                              ),
-                            ),
-                          ),
-                        ))
-                            .toList(),
-                        onChanged: (value) {
-                          setState(() {
-                            selectedCountry = value;
-                            selectedCity = null;
-                            availableCities = countryCityMap[value!] ?? [];
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: "Country",
-                          filled: true,
-                          fillColor: Color(0xFFE7EBED),
-                        ),
-                        icon: Icon(Icons.arrow_drop_down, color: Color(0xFF24786D)),
-                      ),
-                    ],
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: Stack(
-                    children: [
-                      DropdownButtonFormField<String>(
-                        value: selectedCity,
-                        items: availableCities
-                            .map((city) => DropdownMenuItem(
-                          value: city,
-                          child: Padding(
-                            padding: const EdgeInsets.only(left: 40.0),
-                            child: Text(
-                              city,
-                              style: TextStyle(
-                                fontFamily: 'Fira Sans Condensed',
-                                fontSize: 16,
-                                fontWeight: FontWeight.w400,
-                                color: Color(0xFF121414),
-                              ),
-                            ),
-                          ),
-                        ))
-                            .toList(),
-                        onChanged: selectedCountry != null
-                            ? (value) {
-                          setState(() {
-                            selectedCity = value;
-                          });
-                        }
-                            : null,
-                        decoration: InputDecoration(
-                          labelText: "City",
-                          filled: true,
-                          fillColor: Color(0xFFE7EBED),
-                        ),
-                        icon: Icon(Icons.arrow_drop_down, color: Color(0xFF24786D)),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+            CustomDropdownField(
+              label: "City",
+              value: selectedCity,
+              options: availableCities,
+              onChanged: selectedCountry != null
+                  ? (value) => setState(() => selectedCity = value)
+                  : null,
             ),
             SizedBox(height: 24),
+
             // Dates of Visit Section
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  "Dates of visit",
-                  style: TextStyle(
-                    fontFamily: 'Fira Sans Condensed',
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: Color(0xFF24786D),
-                  ),
-                ),
-                SizedBox(height: 8),
-                Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: fromDateController,
-                        readOnly: true,
-                        onTap: () => _selectDate(fromDateController),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.calendar_today, color: Color(0xFF121414)),
-                          hintText: "DD.MM.YYYY",
-                          filled: true,
-                          fillColor: Color(0xFFE7EBED),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: TextField(
-                        controller: toDateController,
-                        readOnly: true,
-                        onTap: () => _selectDate(toDateController),
-                        decoration: InputDecoration(
-                          prefixIcon: Icon(Icons.calendar_today, color: Color(0xFF121414)),
-                          hintText: "DD.MM.YYYY",
-                          filled: true,
-                          fillColor: Color(0xFFE7EBED),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                            borderSide: BorderSide.none,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+            DatePickerField(
+                label: "From Date",
+                controller: fromDateController,
+                onDateSelected: () {},
+                initialDate: DateTime.now(),
+                lastDate: DateTime(2030, 1, 1)
+            ),
+            SizedBox(height: 16),
+            DatePickerField(
+                label: "To Date",
+                controller: toDateController,
+                onDateSelected: () {},
+                initialDate: DateTime.now(),
+                lastDate: DateTime(2030, 1, 1)
             ),
             Spacer(),
-            ElevatedButton(
+
+            SubmitButton(
+              text: "Create an account",
+              isEnabled: selectedCountry != null && selectedCity != null,
               onPressed: selectedCountry != null && selectedCity != null
-                  ? () {
-                Navigator.pushNamed(context, '/match');
-              }
+                  ? () => Navigator.pushNamed(context, '/match')
                   : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                selectedCountry != null && selectedCity != null ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                fixedSize: Size(327, 48),
-                elevation: 0,
-              ),
-              child: Text(
-                "Create an account",
-                style: TextStyle(
-                  fontFamily: 'Fira Sans Condensed',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: selectedCountry != null && selectedCity != null ? Color(0xFFFFFFFF) : Color(0xFFBDBDBD),
-                ),
-              ),
             ),
             SizedBox(height: 16),
             ProfileProgressIndicator(step: 3),

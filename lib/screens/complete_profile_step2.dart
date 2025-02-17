@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../widgets/chips_input.dart';
 import '../widgets/progress_indicator.dart';
+import '../widgets/fields.dart';
 
 class CompleteProfileStep2 extends StatefulWidget {
   @override
@@ -74,58 +75,12 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             // Header with underline
-            Align(
-              alignment: Alignment.center,
-              child: Stack(
-                clipBehavior: Clip.none,
-                children: [
-                  RichText(
-                    text: TextSpan(
-                      style: TextStyle(
-                        fontFamily: 'Fira Sans Condensed',
-                        fontStyle: FontStyle.normal,
-                        fontWeight: FontWeight.w400,
-                        fontSize: 24,
-                        height: 1.0,
-                        color: Color(0xFF121414),
-                      ),
-                      children: [
-                        TextSpan(text: "Complete your "),
-                        TextSpan(
-                          text: "profile",
-                          style: TextStyle(color: Color(0xFF121414)),
-                        ),
-                      ],
-                    ),
-                  ),
-                  Positioned(
-                    bottom: -5,
-                    left: 150,
-                    child: Container(
-                      width: 65,
-                      height: 8,
-                      color: Color(0xFF77C2C8),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            ProfileHeader(),
             SizedBox(height: 8),
-            Align(
-              alignment: Alignment.center,
-              child: Text(
-                "Let’s start with some basic information!",
-                style: TextStyle(
-                  fontFamily: 'Fira Sans Condensed',
-                  fontStyle: FontStyle.normal,
-                  fontWeight: FontWeight.w400,
-                  fontSize: 16,
-                  height: 1.25,
-                  color: Color(0xFF77C2C8),
-                ),
-              ),
-            ),
+
+            ProfileDescription(text: "Tell us a bit more about yourself!"),
             SizedBox(height: 86),
+
             // ChipsInput for Interests
             ChipsInput(
               label: "Interests",
@@ -139,6 +94,7 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
               },
             ),
             SizedBox(height: 16),
+
             // ChipsInput for Languages
             ChipsInput(
               label: "Languages",
@@ -152,61 +108,19 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
               },
             ),
             SizedBox(height: 16),
+
             // Bio Input
-            TextField(
-              controller: bioController,
-              decoration: InputDecoration(
-                labelText: "Bio",
-                labelStyle: TextStyle(
-                  fontFamily: 'Fira Sans Condensed',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: Color(0xFF24786D),
-                ),
-                enabledBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFFE0E0E0)),
-                ),
-                focusedBorder: UnderlineInputBorder(
-                  borderSide: BorderSide(color: Color(0xFF54A59B), width: 2.0),
-                ),
-              ),
-              maxLines: 3,
-              textInputAction: TextInputAction.done, // Устанавливаем действие кнопки "Done"
-              onSubmitted: (value) {
-                // Действие при нажатии "Return" или "Done"
-                FocusScope.of(context).unfocus(); // Скрыть клавиатуру
-                // Здесь можно также добавить логику сохранения, если необходимо
-                print("Bio submitted: $value");
-              },
-            ),
+            CustomTextField(label: "Bio", controller: bioController),
             Spacer(),
+
             // Complete Button
-            ElevatedButton(
-              onPressed: isFormValid
-                  ? () {
-                Navigator.pushNamed(context, '/step3');
-              }
-                  : null,
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                isFormValid ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                fixedSize: Size(327, 48),
-                elevation: 0,
-              ),
-              child: Text(
-                isFormValid ? "Complete form" : "Complete",
-                style: TextStyle(
-                  fontFamily: 'Fira Sans Condensed',
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
-                  color: isFormValid ? Color(0xFFFFFFFF) : Color(0xFFBDBDBD),
-                ),
-              ),
+            SubmitButton(
+              text: "Complete form",
+              isEnabled: isFormValid,
+              onPressed: isFormValid ? () => Navigator.pushNamed(context, '/step3') : null,
             ),
             SizedBox(height: 16),
+
             ProfileProgressIndicator(step: 2),
             SizedBox(height: 16),
           ],

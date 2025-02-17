@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
+
+import '../widgets/logo.dart';
 
 class WelcomeScreen extends StatelessWidget {
   @override
@@ -23,36 +26,15 @@ class WelcomeScreen extends StatelessWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // Иконка слева
-                      Image.asset(
-                        'assets/icons/logo_icon.png', // Замените на путь к вашей иконке
-                        width: 24, // Задайте ширину иконки
-                        height: 24, // Задайте высоту иконки
-                      ),
-                      // Текст "Discoveria"
-                      Text(
-                        "Discoveria",
-                        style: TextStyle(
-                          fontFamily: 'Fira Sans Condensed',
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 16,
-                          height: 14 / 16,
-                          textBaseline: TextBaseline.alphabetic,
-                          color: Color(0xFF121414),
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                    ],
-                  ),
+                  SizedBox(height: 30),
+                  DiscoveriaLogo(),
                   SizedBox(height: 40),
                   Padding(
-                    padding: const EdgeInsets.only(left: 60.0), // Добавлен отступ слева
+                    padding: const EdgeInsets.only(left: 60.0),
+                    // Добавлен отступ слева
                     child: Align(
-                      alignment: Alignment.centerLeft, // Выравнивание по левому краю
+                      alignment: Alignment.centerLeft,
+                      // Выравнивание по левому краю
                       child: RichText(
                         text: TextSpan(
                           style: TextStyle(
@@ -63,15 +45,15 @@ class WelcomeScreen extends StatelessWidget {
                           children: [
                             TextSpan(
                               text: "Travel ",
-                              style: TextStyle(color: Color(0xFF78BFC5)),
+                              style: TextStyle(color: Color(0xFF8AC0C7)),
                             ),
                             TextSpan(
                               text: "together,\n",
                               style: TextStyle(color: Color(0xFF121414)),
                             ),
                             TextSpan(
-                              text: "Discover ",
-                              style: TextStyle(color: Color(0xFF78BFC5)),
+                              text: "Explore ",
+                              style: TextStyle(color: Color(0xFF8AC0C7)),
                             ),
                             TextSpan(
                               text: "together",
@@ -159,30 +141,47 @@ class WelcomeScreen extends StatelessWidget {
                     ],
                   ),
                   SizedBox(height: 20),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      // "Existing account?" обычный текст
-                      Text(
-                        "Existing account?",
-                        style: TextStyle(
-                          fontFamily: 'Fira Sans Condensed',
-                          fontStyle: FontStyle.normal,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 14,
-                          height: 14 / 14,
-                          letterSpacing: 0.1,
-                          color: Color(0xFF797C7B),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/signup');
+                    },
+                    style: ButtonStyle(
+                      backgroundColor:
+                          MaterialStateProperty.resolveWith((states) {
+                        if (states.contains(MaterialState.disabled)) {
+                          return Colors.transparent;
+                        }
+                        return Color(0xFF8AC0C7);
+                      }),
+                      shape: MaterialStateProperty.all(
+                        RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      SizedBox(width: 4), // Пробел между текстами
-                      // "Log in" кликабельный
-                      GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/login');
-                        },
-                        child: Text(
-                          "Log in",
+                      fixedSize: MaterialStateProperty.all(Size(327, 48)),
+                      elevation: MaterialStateProperty.all(0),
+                    ),
+                    child: Text(
+                      "Sign up via email",
+                      style: TextStyle(
+                        fontFamily: 'Fira Sans Condensed',
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16,
+                        height: 1.0,
+                        color: Color(0xFF424545),
+                      ),
+                    ),
+                  ),
+                  Spacer(),
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 40.0),
+                    // 20px отступ снизу
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        // "Existing account?" обычный текст
+                        Text(
+                          "Existing account?",
                           style: TextStyle(
                             fontFamily: 'Fira Sans Condensed',
                             fontStyle: FontStyle.normal,
@@ -190,13 +189,31 @@ class WelcomeScreen extends StatelessWidget {
                             fontSize: 14,
                             height: 14 / 14,
                             letterSpacing: 0.1,
-                            color: Color(0xFF202020),
+                            color: Color(0xFF797C7B),
                           ),
                         ),
-                      ),
-                    ],
+                        SizedBox(width: 4), // Пробел между текстами
+                        // "Log in" кликабельный
+                        GestureDetector(
+                          onTap: () {
+                            print("Pressed log in");
+                            Navigator.pushNamed(
+                                context, '/login'); // Теперь работает правильно
+                          },
+                          child: Text(
+                            "Log in",
+                            style: TextStyle(
+                              fontFamily: 'Fira Sans Condensed',
+                              fontWeight: FontWeight.w400,
+                              fontSize: 14,
+                              letterSpacing: 0.1,
+                              color: Color(0xFF202020),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-
                 ],
               ),
             ),
