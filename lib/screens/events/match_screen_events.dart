@@ -1,8 +1,48 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_card_swiper/flutter_card_swiper.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:discoveria/screens/events/create_event.dart';
 import 'package:discoveria/screens/events/request_screen.dart';
+
+class Event {
+  final String id;
+  final String title;
+  final String eventDate;
+  final int cntPeople;
+  final String eventImg;
+  final String address;
+  final String description;
+  final String cityName;
+
+  Event({
+    required this.id,
+    required this.title,
+    required this.eventDate,
+    required this.cntPeople,
+    required this.eventImg,
+    required this.address,
+    required this.description,
+    required this.cityName,
+  });
+
+  factory Event.fromJson(Map<String, dynamic> json) {
+    return Event(
+      id: json['id'] ?? '',
+      title: json['title'] ?? '',
+      eventDate: json['event_date'] ?? '',
+      cntPeople: json['cnt_people'] is int
+          ? json['cnt_people']
+          : int.tryParse(json['cnt_people'].toString()) ?? 0,
+      eventImg: json['event_img'] ?? '',
+      address: json['address'] ?? '',
+      description: json['description'] ?? '',
+      cityName: json['city']?['name'] ?? '',
+    );
+  }
+}
 
 class MatchScreenEvents extends StatefulWidget {
   @override
@@ -10,27 +50,75 @@ class MatchScreenEvents extends StatefulWidget {
 }
 
 class _MatchScreenEventsState extends State<MatchScreenEvents> {
-  final List<Map<String, String>> events = [
-    {
-      "title": "Party in LA",
-      "date": "09.10.2024",
-      "attendees": "50",
-      "image": "https://picsum.photos/300?random=2",
-    },
-    {
-      "title": "Tech Conference",
-      "date": "12.11.2024",
-      "attendees": "200",
-      "image": "https://picsum.photos/300?random=1",
-    },
-  ];
+  List<Event> events = [];
+  String? nextPageUrl = 'https://xplora.robosoft.kz/api/events/';
+  bool isLoading = false;
 
   final CardSwiperController _swiperController = CardSwiperController();
-  int currentIndex = 0; // ✅ Храним текущий индекс
-  CardSwiperDirection? _lastSwipeDirection; // Направление последнего свайпа
+  int currentIndex = 0;
+  CardSwiperDirection? _lastSwipeDirection;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadEvents();
+  }
+
+  Future<void> _loadEvents() async {
+    if (nextPageUrl == null || isLoading) return;
+
+    setState(() {
+      isLoading = true;
+    });
+
+    // Получаем токен из shared_preferences (если он используется)
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    try {
+      final response = await http.get(
+        Uri.parse(nextPageUrl!),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+      );
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        List<dynamic> results = data['results'] ?? [];
+        List<Event> loadedEvents =
+        results.map((json) => Event.fromJson(json)).toList();
+        setState(() {
+          events.addAll(loadedEvents);
+          nextPageUrl = data['next']; // если null – пагинация окончена
+        });
+      } else {
+        print('Ошибка: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Ошибка загрузки событий: $e');
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  // Проверяем необходимость подгрузки следующей страницы (например, когда осталось 1-2 события)
+  void _checkPagination(int index) {
+    if (index >= events.length - 2 && nextPageUrl != null) {
+      _loadEvents();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    // Если события ещё не загружены, показываем индикатор загрузки.
+    if (events.isEmpty && isLoading) {
+      return Scaffold(
+        body: Center(child: CircularProgressIndicator()),
+      );
+    }
+
     return Scaffold(
       body: Stack(
         children: [
@@ -40,8 +128,9 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               child: CardSwiper(
                 cardsCount: events.length,
                 controller: _swiperController,
-                numberOfCardsDisplayed: 1,
+                numberOfCardsDisplayed: events.isEmpty ? 0 : 1,
                 cardBuilder: (BuildContext context, int index, int _, int __) {
+                  _checkPagination(index);
                   final event = events[index];
                   return Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20.0),
@@ -55,7 +144,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                         child: Stack(
                           children: [
                             Image.network(
-                              event['image']!,
+                              event.eventImg,
                               height: double.infinity,
                               width: double.infinity,
                               fit: BoxFit.cover,
@@ -90,55 +179,55 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                               child: Padding(
                                 padding: const EdgeInsets.all(16.0),
                                 child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Column(
-                                      crossAxisAlignment:
-                                      CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          event['title']!,
-                                          style: TextStyle(
-                                            fontFamily: 'Fira Sans Condensed',
-                                            color: Colors.white,
-                                            fontSize: 24,
-                                          ),
-                                        ),
-                                        Text(
-                                          "${event['date']}",
-                                          style: TextStyle(
-                                            fontFamily: 'Fira Sans Condensed',
-                                            color: Colors.white,
-                                            fontSize: 20,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Column(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Row(
-                                          children: [
-                                            Icon(
-                                              Icons.person,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            event.title,
+                                            style: TextStyle(
+                                              fontFamily: 'Fira Sans Condensed',
                                               color: Colors.white,
-                                              size: 24,
+                                              fontSize: 24,
                                             ),
-                                            SizedBox(width: 4),
-                                            Text(
-                                              "~${event['attendees']} attendees",
+                                          ),
+                                          Text(
+                                            event.eventDate,
+                                            style: TextStyle(
+                                              fontFamily: 'Fira Sans Condensed',
+                                              color: Colors.white,
+                                              fontSize: 20,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Expanded(
+                                      child: Row(
+                                        mainAxisAlignment: MainAxisAlignment.end,
+                                        children: [
+                                          Icon(
+                                            Icons.person,
+                                            color: Colors.white,
+                                            size: 24,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Flexible(
+                                            child: Text(
+                                              "~${event.cntPeople} attendees",
+                                              overflow: TextOverflow.ellipsis,
                                               style: TextStyle(
-                                                fontFamily:
-                                                'Fira Sans Condensed',
+                                                fontFamily: 'Fira Sans Condensed',
                                                 color: Colors.white,
                                                 fontSize: 20,
                                               ),
                                             ),
-                                          ],
-                                        ),
-                                      ],
+                                          ),
+                                        ],
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -150,14 +239,13 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                     ),
                   );
                 },
-                onSwipe: (int index, int? previousIndex,
-                    CardSwiperDirection direction) {
+                onSwipe: (int index, int? previousIndex, CardSwiperDirection direction) {
                   setState(() {
                     currentIndex = index;
-                    _lastSwipeDirection = direction; // Запоминаем направление свайпа
+                    _lastSwipeDirection = direction;
                   });
 
-                  // Показываем эффект на 500мс, затем очищаем эффект и (если лайк) переходим на следующий экран.
+                  // После 500мс, сбрасываем визуальный эффект и, если свайп вправо – переходим на экран заявки.
                   Future.delayed(Duration(milliseconds: 500), () {
                     setState(() {
                       _lastSwipeDirection = null;
@@ -168,8 +256,8 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                         context,
                         MaterialPageRoute(
                           builder: (context) => RequestToJoinEventScreen(
-                            eventName: selectedEvent['title']!,
-                            eventDate: selectedEvent['date']!,
+                            eventName: selectedEvent.title,
+                            eventDate: selectedEvent.eventDate,
                           ),
                         ),
                       );
@@ -182,8 +270,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               ),
             ),
           ),
-
-          // Кнопки в верхнем левом углу
+          // Верхние кнопки: создание события и редактирование
           Positioned(
             top: 20,
             left: 20,
@@ -269,8 +356,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               ],
             ),
           ),
-
-          // Кнопка в нижней части экрана
+          // Кнопка в нижней части экрана для заявки на участие
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -282,8 +368,8 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => RequestToJoinEventScreen(
-                        eventName: selectedEvent['title']!,
-                        eventDate: selectedEvent['date']!,
+                        eventName: selectedEvent.title,
+                        eventDate: selectedEvent.eventDate,
                       ),
                     ),
                   );
@@ -307,7 +393,6 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               ),
             ),
           ),
-
           // Оверлей с иконкой для визуальной индикации свайпа
           if (_lastSwipeDirection != null)
             Center(
