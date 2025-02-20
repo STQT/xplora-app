@@ -15,9 +15,11 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
       "age": "20",
       "location": "London 29/10-31/10",
       "image": "https://picsum.photos/300?random=1",
-      "interests": "Visiting museums, Playing and watching sports, Trying out new restaurants",
+      "interests":
+      "Visiting museums, Playing and watching sports, Trying out new restaurants",
       "languages": "English, Urdu",
-      "bio": "Hey! I’m Jihan, a 20-year-old college student heading to London for a conference...",
+      "bio":
+      "Hey! I’m Jihan, a 20-year-old college student heading to London for a conference...",
     },
     {
       "name": "Anel",
@@ -26,7 +28,8 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
       "image": "https://picsum.photos/300?random=2",
       "interests": "Reading books, Watching movies, Exploring cities",
       "languages": "English, French",
-      "bio": "I’m Anel, a 21-year-old who loves books, movies, and city adventures...",
+      "bio":
+      "I’m Anel, a 21-year-old who loves books, movies, and city adventures...",
     },
   ];
 
@@ -36,6 +39,9 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
   int currentIndex = 0;
 
   final CardSwiperController _swiperController = CardSwiperController();
+
+  // Новая переменная для направления свайпа
+  CardSwiperDirection? _lastSwipeDirection;
 
   @override
   void initState() {
@@ -116,6 +122,24 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
                       color: Colors.white,
                     ),
                   ),
+                ),
+              ),
+            ),
+
+          // Оверлей с иконкой для визуальной индикации свайпа
+          if (_lastSwipeDirection != null)
+            Center(
+              child: AnimatedOpacity(
+                opacity: _lastSwipeDirection != null ? 1.0 : 0.0,
+                duration: Duration(milliseconds: 300),
+                child: Icon(
+                  _lastSwipeDirection == CardSwiperDirection.right
+                      ? Icons.favorite
+                      : Icons.close,
+                  color: _lastSwipeDirection == CardSwiperDirection.right
+                      ? Colors.green
+                      : Colors.red,
+                  size: 100,
                 ),
               ),
             ),
@@ -208,6 +232,14 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
           onSwipe: (int index, int? previousIndex, CardSwiperDirection direction) {
             setState(() {
               currentIndex = index;
+              _lastSwipeDirection = direction; // Запоминаем направление свайпа
+            });
+
+            // Показываем эффект на 500 мс и затем сбрасываем его
+            Future.delayed(Duration(milliseconds: 500), () {
+              setState(() {
+                _lastSwipeDirection = null;
+              });
             });
 
             if (direction == CardSwiperDirection.right) {
@@ -254,7 +286,6 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
               Divider(color: Colors.white),
               Text("Languages", style: _headerStyle()),
               Text(person['languages']!, style: _textStyle()),
-
               // 🔹 Кнопка Switch (детальная сторона)
               Align(
                 alignment: Alignment.bottomRight,
@@ -279,6 +310,8 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
     );
   }
 
-  TextStyle _headerStyle() => TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white);
-  TextStyle _textStyle() => TextStyle(fontSize: 14, color: Colors.white);
+  TextStyle _headerStyle() =>
+      TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white);
+  TextStyle _textStyle() =>
+      TextStyle(fontSize: 14, color: Colors.white);
 }

@@ -27,6 +27,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
 
   final CardSwiperController _swiperController = CardSwiperController();
   int currentIndex = 0; // ✅ Храним текущий индекс
+  CardSwiperDirection? _lastSwipeDirection; // Направление последнего свайпа
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +35,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
       body: Stack(
         children: [
           Padding(
-            padding: const EdgeInsets.only(top: 130.0, bottom: 70.0),
+            padding: const EdgeInsets.only(top: 100.0, bottom: 100.0),
             child: Center(
               child: CardSwiper(
                 cardsCount: events.length,
@@ -152,22 +153,28 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                 onSwipe: (int index, int? previousIndex,
                     CardSwiperDirection direction) {
                   setState(() {
-                    currentIndex = index; // ✅ Обновляем индекс при свайпе
+                    currentIndex = index;
+                    _lastSwipeDirection = direction; // Запоминаем направление свайпа
                   });
 
-                  if (direction == CardSwiperDirection.right) {
-                    final selectedEvent = events[currentIndex];
-
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => RequestToJoinEventScreen(
-                          eventName: selectedEvent['title']!,
-                          eventDate: selectedEvent['date']!,
+                  // Показываем эффект на 500мс, затем очищаем эффект и (если лайк) переходим на следующий экран.
+                  Future.delayed(Duration(milliseconds: 500), () {
+                    setState(() {
+                      _lastSwipeDirection = null;
+                    });
+                    if (direction == CardSwiperDirection.right) {
+                      final selectedEvent = events[currentIndex];
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => RequestToJoinEventScreen(
+                            eventName: selectedEvent['title']!,
+                            eventDate: selectedEvent['date']!,
+                          ),
                         ),
-                      ),
-                    );
-                  }
+                      );
+                    }
+                  });
                   return true;
                 },
                 padding: EdgeInsets.zero,
@@ -176,11 +183,11 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
             ),
           ),
 
+          // Кнопки в верхнем левом углу
           Positioned(
             top: 20,
             left: 20,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Row(
               children: [
                 ElevatedButton(
                   onPressed: () {
@@ -220,6 +227,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                     ],
                   ),
                 ),
+                SizedBox(width: 16),
                 ElevatedButton(
                   onPressed: () {
                     Navigator.push(
@@ -262,6 +270,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
             ),
           ),
 
+          // Кнопка в нижней части экрана
           Align(
             alignment: Alignment.bottomCenter,
             child: Padding(
@@ -269,7 +278,6 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               child: ElevatedButton(
                 onPressed: () {
                   final selectedEvent = events[currentIndex];
-
                   Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -299,6 +307,24 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
               ),
             ),
           ),
+
+          // Оверлей с иконкой для визуальной индикации свайпа
+          if (_lastSwipeDirection != null)
+            Center(
+              child: AnimatedOpacity(
+                opacity: _lastSwipeDirection != null ? 1.0 : 0.0,
+                duration: Duration(milliseconds: 300),
+                child: Icon(
+                  _lastSwipeDirection == CardSwiperDirection.right
+                      ? Icons.favorite
+                      : Icons.close,
+                  color: _lastSwipeDirection == CardSwiperDirection.right
+                      ? Colors.green
+                      : Colors.red,
+                  size: 100,
+                ),
+              ),
+            ),
         ],
       ),
     );
