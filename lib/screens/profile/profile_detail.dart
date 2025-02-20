@@ -51,7 +51,6 @@ class ProfileScreen extends StatelessWidget {
               _buildSection("Interests", ["Yoga", "Shopping", "Hiking"]),
               _buildSection("Languages", ["English", "French"]),
               _buildBioSection(),
-              _buildPlacesVisited(),
 
               SizedBox(height: 20),
             ],
@@ -137,86 +136,6 @@ class ProfileScreen extends StatelessWidget {
           Divider(),
         ],
       ),
-    );
-  }
-
-  // Виджет для раздела "Places visited"
-  Widget _buildPlacesVisited() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Text(
-                "Places visited",
-                style: TextStyle(
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold,
-                  fontFamily: 'Fira Sans Condensed',
-                ),
-              ),
-              SizedBox(width: 6),
-              SvgPicture.asset(
-                "assets/icons/edit.svg",
-                width: 18,
-                height: 18,
-                color: Color(0xFF77C2C8),
-              ),
-            ],
-          ),
-          SizedBox(height: 8),
-          Row(
-            children: [
-              _buildPlaceImage("https://picsum.photos/100?random=1"),
-              SizedBox(width: 8),
-              _buildPlaceImage("https://picsum.photos/100?random=2"),
-              SizedBox(width: 8),
-              _buildPlaceImage("https://picsum.photos/100?random=3",
-                  isMore: true),
-            ],
-          ),
-          Divider(),
-        ],
-      ),
-    );
-  }
-
-  // Виджет для изображений посещенных мест
-  Widget _buildPlaceImage(String imageUrl, {bool isMore = false}) {
-    return Stack(
-      alignment: Alignment.center,
-      children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            imageUrl,
-            width: 70,
-            height: 70,
-            fit: BoxFit.cover,
-          ),
-        ),
-        if (isMore)
-          Container(
-            width: 70,
-            height: 70,
-            decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Center(
-              child: Text(
-                "+10",
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
-      ],
     );
   }
 }
