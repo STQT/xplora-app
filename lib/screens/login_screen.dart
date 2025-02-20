@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/login_provider.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -9,6 +12,7 @@ class _LoginScreenState extends State<LoginScreen> {
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   bool isButtonActive = false;
+  String? errorMessage;
 
   @override
   void initState() {
@@ -24,6 +28,24 @@ class _LoginScreenState extends State<LoginScreen> {
     });
   }
 
+  void _login() async {
+    final provider = Provider.of<LoginProvider>(context, listen: false);
+
+    bool success = await provider.loginUser(
+      emailController.text,
+      passwordController.text,
+    );
+
+    if (success) {
+      Navigator.pushReplacementNamed(context, '/step1');
+    } else {
+      setState(() {
+        errorMessage = provider.errorMessage;
+      });
+    }
+  }
+
+
   @override
   void dispose() {
     emailController.dispose();
@@ -33,6 +55,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final provider = Provider.of<LoginProvider>(context);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -154,6 +178,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 ],
               ),
               SizedBox(height: 24),
+              if (errorMessage != null) // Отображение ошибки
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8.0),
+                  child: Text(
+                    errorMessage!,
+                    style: TextStyle(color: Colors.red, fontSize: 14),
+                  ),
+                ),
               TextField(
                 controller: emailController,
                 decoration: InputDecoration(
@@ -209,38 +241,31 @@ class _LoginScreenState extends State<LoginScreen> {
                 obscureText: true,
               ),
               SizedBox(height: 24),
-              ElevatedButton(
-                onPressed: isButtonActive
-                    ? () {
-                  Navigator.pushNamed(context, '/step1');
-                }
-                    : null,
-                style: ButtonStyle(
-                  backgroundColor: MaterialStateProperty.resolveWith((states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return Colors.transparent;
-                    }
-                    return Color(0xFF20A090);
-                  }),
-                  shape: MaterialStateProperty.all(
-                    RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16.0),
+              provider.isLoading
+                  ? CircularProgressIndicator()
+                  : ElevatedButton(
+                      onPressed: isButtonActive ? _login : null,
+                      style: ButtonStyle(
+                        backgroundColor:
+                            MaterialStateProperty.resolveWith((states) {
+                          if (states.contains(MaterialState.disabled))
+                            return Colors.transparent;
+                          return Color(0xFF20A090);
+                        }),
+                        shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16.0))),
+                        fixedSize: MaterialStateProperty.all(Size(327, 48)),
+                        elevation: MaterialStateProperty.all(0),
+                      ),
+                      child: Text(
+                        "Log in",
+                        style: TextStyle(
+                            fontSize: 16,
+                            color: isButtonActive
+                                ? Colors.white
+                                : Color(0xFF797C7B)),
+                      ),
                     ),
-                  ),
-                  fixedSize: MaterialStateProperty.all(Size(327, 48)),
-                  elevation: MaterialStateProperty.all(0),
-                ),
-                child: Text(
-                  "Log in",
-                  style: TextStyle(
-                    fontFamily: 'Fira Sans Condensed',
-                    fontWeight: FontWeight.w400,
-                    fontSize: 16,
-                    height: 1.0,
-                    color: isButtonActive ? Color(0xFFFFFFFF) : Color(0xFF797C7B),
-                  ),
-                ),
-              ),
               TextButton(
                 onPressed: () {
                   // Forgot password logic

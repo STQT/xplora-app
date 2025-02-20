@@ -1,4 +1,6 @@
 import 'package:discoveria/providers/email_verification_provider.dart';
+import 'package:discoveria/providers/login_provider.dart';
+import 'package:discoveria/providers/profile_provider.dart';
 import 'package:discoveria/screens/authorization/email_verification_screen.dart';
 import 'package:discoveria/screens/authorization/signup_screen.dart';
 import 'package:discoveria/screens/welcome_screen.dart';
@@ -17,8 +19,10 @@ void main() {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => LoginProvider()),
         ChangeNotifierProvider(create: (_) => SignUpProvider()),
         ChangeNotifierProvider(create: (_) => EmailVerificationProvider()),
+        ChangeNotifierProvider(create: (_) => ProfileProvider()),
       ],
       child: DiscoveriaApp(),
     ),
@@ -30,7 +34,7 @@ class DiscoveriaApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      initialRoute: '/step1', // Перенесли FutureBuilder сюда
+      initialRoute: '/initial', // Перенесли FutureBuilder сюда
       routes: {
         '/initial': (context) => InitialRouteScreen(),
         '/': (context) => WelcomeScreen(),

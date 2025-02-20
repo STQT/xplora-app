@@ -17,6 +17,8 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
   Future<void> _determineInitialRoute() async {
     try {
       bool isAuth = await AuthService.isAuthenticated();
+      print(isAuth);
+      print("IS AUTH");
 
       if (!isAuth) {
         Navigator.pushReplacementNamed(context, '/'); // Перенаправление на WelcomeScreen
@@ -25,7 +27,7 @@ class _InitialRouteScreenState extends State<InitialRouteScreen> {
 
       final userProfile = await UserService.getUserProfile();
 
-      if (userProfile == null || userProfile['profile_completed'] == false) {
+      if (userProfile == null || userProfile['profile'] == null) {
         Navigator.pushReplacementNamed(context, '/step1'); // Перенаправление на заполнение анкеты
         return;
       }

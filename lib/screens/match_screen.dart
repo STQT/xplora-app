@@ -38,7 +38,7 @@ class _MatchScreenState extends State<MatchScreen>
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            "Discoveria",
+            "Xplora",
             style: TextStyle(
               color: Color(0xFF77C2C8),
               fontFamily: 'Fira Sans Condensed',

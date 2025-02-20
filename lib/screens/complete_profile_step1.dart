@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/progress_indicator.dart';
 import '../widgets/fields.dart';
+import '../providers/profile_provider.dart';
 
 class CompleteProfileStep1 extends StatefulWidget {
   @override
@@ -8,15 +10,23 @@ class CompleteProfileStep1 extends StatefulWidget {
 }
 
 class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
-  final firstNameController = TextEditingController(text: "Shokan");
-  final lastNameController = TextEditingController(text: "Iliyas");
-  final dobController = TextEditingController(text: "01.01.2000");
+  final firstNameController = TextEditingController();
+  final lastNameController = TextEditingController();
+  final dobController = TextEditingController();
   String? selectedGender;
   bool isFormValid = false;
 
   @override
   void initState() {
     super.initState();
+
+    // Загружаем данные из провайдера (если они уже были сохранены)
+    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    firstNameController.text = provider.firstName;
+    lastNameController.text = provider.lastName;
+    dobController.text = provider.dob;
+    selectedGender = provider.gender;
+
     firstNameController.addListener(_validateForm);
     lastNameController.addListener(_validateForm);
     dobController.addListener(_validateForm);
@@ -39,6 +49,18 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
     });
   }
 
+  void _saveAndNext() {
+    final provider = Provider.of<ProfileProvider>(context, listen: false);
+    provider.updateProfileStep1(
+      firstName: firstNameController.text,
+      lastName: lastNameController.text,
+      dob: dobController.text,
+      gender: selectedGender!,
+    );
+
+    Navigator.pushNamed(context, '/step2'); // Переход на следующий шаг
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,7 +72,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
           onPressed: () => Navigator.pop(context),
         ),
       ),
-      body: SingleChildScrollView( // ⬅️ Добавили прокрутку, если контент превышает экран
+      body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
@@ -58,76 +80,29 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
             children: [
               ProfileHeader(),
               SizedBox(height: 8),
-              ProfileDescription(text: "Let’s start with some basic information!"),
+              ProfileDescription(
+                  text: "Let’s start with some basic information!"),
               SizedBox(height: 32),
-
-              CustomTextField(label: "First Name", controller: firstNameController),
+              CustomTextField(
+                  label: "First Name", controller: firstNameController),
               SizedBox(height: 16),
-              CustomTextField(label: "Last Name", controller: lastNameController),
+              CustomTextField(
+                  label: "Last Name", controller: lastNameController),
               SizedBox(height: 24),
-
-
               _buildGenderSection(),
               SizedBox(height: 16),
               _buildDatePickerField(),
-
-              SizedBox(height: 32), // ⬅️ Добавил отступ перед кнопкой
-
-              _buildSubmitButton(),
+              SizedBox(height: 32),
+              SubmitButton(
+                text: "Complete form",
+                isEnabled: isFormValid,
+                onPressed: isFormValid ? _saveAndNext : null,
+              ),
               SizedBox(height: 16),
-
-              ProfileProgressIndicator(step: 1), // ⬅️ Прогресс-бар теперь всегда виден
+              ProfileProgressIndicator(step: 1),
               SizedBox(height: 24),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildHeader() {
-    return Align(
-      alignment: Alignment.center,
-      child: Stack(
-        clipBehavior: Clip.none,
-        children: [
-          RichText(
-            text: TextSpan(
-              style: _textStyle(fontSize: 24, color: Color(0xFF121414)),
-              children: [
-                TextSpan(text: "Complete your "),
-                TextSpan(
-                  text: "profile",
-                  style: TextStyle(color: Color(0xFF121414)),
-                ),
-              ],
-            ),
-          ),
-          Positioned(
-            bottom: -5,
-            left: 150,
-            child: Container(
-              width: 65,
-              height: 8,
-              color: Color(0xFF8AC0C7),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(String label, TextEditingController controller) {
-    return TextField(
-      controller: controller,
-      decoration: InputDecoration(
-        labelText: label,
-        labelStyle: _textStyle(fontSize: 16, color: Color(0xFF8AC0C7)),
-        enabledBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFFE0E0E0)),
-        ),
-        focusedBorder: UnderlineInputBorder(
-          borderSide: BorderSide(color: Color(0xFF54A59B), width: 2.0),
         ),
       ),
     );
@@ -137,20 +112,21 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text("Gender", style: _textStyle(fontSize: 16, color: Color(0xFF8AC0C7))),
+        Text("Gender",
+            style: TextStyle(fontSize: 16, color: Color(0xFF8AC0C7))),
         SizedBox(height: 16),
         Wrap(
           spacing: 16.0,
           runSpacing: 8.0,
           children: ["Male", "Female", "Beyond Binary"]
               .map((gender) => GenderRadioButton(
-            label: gender,
-            groupValue: selectedGender,
-            onChanged: (value) {
-              setState(() => selectedGender = value);
-              _validateForm();
-            },
-          ))
+                    label: gender,
+                    groupValue: selectedGender,
+                    onChanged: (value) {
+                      setState(() => selectedGender = value);
+                      _validateForm();
+                    },
+                  ))
               .toList(),
         ),
       ],
@@ -162,7 +138,7 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
       controller: dobController,
       decoration: InputDecoration(
         labelText: "Date of birth",
-        labelStyle: _textStyle(fontSize: 16, color: Color(0xFF8AC0C7)),
+        labelStyle: TextStyle(fontSize: 16, color: Color(0xFF8AC0C7)),
         suffixIcon: Icon(Icons.calendar_today, color: Color(0xFF8AC0C7)),
         enabledBorder: UnderlineInputBorder(
           borderSide: BorderSide(color: Color(0xFFE0E0E0)),
@@ -181,40 +157,10 @@ class _CompleteProfileStep1State extends State<CompleteProfileStep1> {
         );
         if (pickedDate != null) {
           dobController.text =
-          "${pickedDate.day.toString().padLeft(2, '0')}.${pickedDate.month.toString().padLeft(2, '0')}.${pickedDate.year}";
+              "${pickedDate.day.toString().padLeft(2, '0')}.${pickedDate.month.toString().padLeft(2, '0')}.${pickedDate.year}";
           _validateForm();
         }
       },
-    );
-  }
-
-  Widget _buildSubmitButton() {
-    return ElevatedButton(
-      onPressed: isFormValid ? () => Navigator.pushNamed(context, '/step2') : null,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: isFormValid ? Color(0xFF77C2C8) : Color(0xFFE0E0E0),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(16.0),
-        ),
-        fixedSize: Size(327, 48),
-        elevation: 0,
-      ),
-      child: Text(
-        isFormValid ? "Complete form" : "Complete",
-        style: _textStyle(
-          fontSize: 16,
-          color: isFormValid ? Colors.white : Color(0xFFBDBDBD),
-        ),
-      ),
-    );
-  }
-
-  TextStyle _textStyle({required double fontSize, required Color color}) {
-    return TextStyle(
-      fontFamily: 'Fira Sans Condensed',
-      fontSize: fontSize,
-      fontWeight: FontWeight.w400,
-      color: color,
     );
   }
 }
@@ -244,9 +190,7 @@ class GenderRadioButton extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            fontFamily: 'Fira Sans Condensed',
             fontSize: 14,
-            fontWeight: FontWeight.w400,
             color: Color(0xFF121414),
           ),
         ),

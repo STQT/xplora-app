@@ -30,7 +30,7 @@ class _MessagesScreenState extends State<MessagesScreen>
       child: Scaffold(
         appBar: AppBar(
           title: Text(
-            "Discoveria",
+            "Xplora",
             style: TextStyle(
               color: Color(0xFF77C2C8),
               fontFamily: 'Fira Sans Condensed',
