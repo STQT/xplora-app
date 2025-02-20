@@ -16,20 +16,23 @@ class Profile {
   final String interests;
   final String languages;
   final String bio;
+  final String userId;
 
   Profile({
+    required this.userId,
     required this.name,
     required this.age,
     required this.location,
     required this.image,
     required this.interests,
     required this.languages,
-    required this.bio,
+    required this.bio
   });
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     // Пример преобразования: используем firstname как name, можно допилить расчет возраста и location
     return Profile(
+      userId: json['user_id'] ?? '',
       name: json['firstname'] ?? '',
       age: json['birth_date'] ?? '',
       location: json['city']?['name'] ?? '',
@@ -120,6 +123,31 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
     setState(() {
       isLoading = false;
     });
+  }
+
+  Future<void> _sendSwipeRequest(Profile profile, String status) async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AuthConst.tokenKey);
+    try {
+      final response = await http.post(
+        Uri.parse('https://xplora.robosoft.kz/api/user-requests/'),
+        headers: {
+          'Authorization': 'Bearer $token',
+          'Content-Type': 'application/json',
+        },
+        body: jsonEncode({
+          "user_id": profile.userId, // убедитесь, что profile содержит поле user_id
+          "status": status,
+        }),
+      );
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        print("Запрос с статусом '$status' для ${profile.name} отправлен успешно.");
+      } else {
+        print("Ошибка при отправке запроса: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("Ошибка сети: $e");
+    }
   }
 
   void toggleView() {
@@ -306,8 +334,7 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
               ],
             );
           },
-          onSwipe:
-              (int index, int? previousIndex, CardSwiperDirection direction) {
+          onSwipe: (int index, int? previousIndex, CardSwiperDirection direction) {
             setState(() {
               currentIndex = index;
               _lastSwipeDirection = direction;
@@ -317,10 +344,14 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
                 _lastSwipeDirection = null;
               });
             });
+
+            // Вызываем соответствующий запрос в зависимости от направления свайпа
             if (direction == CardSwiperDirection.right) {
               print("Liked ${profiles[index].name}");
+              _sendSwipeRequest(profiles[index], "wait");
             } else if (direction == CardSwiperDirection.left) {
-              print("Skipped ${profiles[index].name}");
+              print("Disliked ${profiles[index].name}");
+              _sendSwipeRequest(profiles[index], "deny");
             }
             return true;
           },
