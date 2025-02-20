@@ -1,8 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:discoveria/components/bottom_nav_bar.dart';
+import 'package:discoveria/screens/welcome_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../constants/auth.dart';
 
 class ProfileScreen extends StatelessWidget {
+  Future<void> _logout(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(AuthConst.tokenKey);
+    // Переход на WelcomeScreen без возможности вернуться назад
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => WelcomeScreen()),
+          (route) => false,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return ScaffoldWithAnimation(
@@ -46,18 +60,36 @@ class ProfileScreen extends StatelessWidget {
                 ),
               ),
               SizedBox(height: 20),
-
               // Interests
               _buildSection("Interests", ["Yoga", "Shopping", "Hiking"]),
               _buildSection("Languages", ["English", "French"]),
               _buildBioSection(),
-
               SizedBox(height: 20),
+              // Кнопка Logout
+              ElevatedButton(
+                onPressed: () => _logout(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.redAccent,
+                  padding: EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                ),
+                child: Text(
+                  "Logout",
+                  style: TextStyle(
+                    fontFamily: 'Fira Sans Condensed',
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
             ],
           ),
         ),
         bottomNavigationBar:
-            CustomBottomNavBar(currentIndex: 2), // Активный таб — "Profile"
+        CustomBottomNavBar(currentIndex: 2), // Активный таб — "Profile"
       ),
     );
   }
@@ -90,10 +122,10 @@ class ProfileScreen extends StatelessWidget {
           ),
           SizedBox(height: 4),
           ...items.map((item) => Text(
-                "• $item",
-                style:
-                    TextStyle(fontSize: 14, fontFamily: 'Fira Sans Condensed'),
-              )),
+            "• $item",
+            style:
+            TextStyle(fontSize: 14, fontFamily: 'Fira Sans Condensed'),
+          )),
           Divider(),
         ],
       ),
@@ -129,8 +161,8 @@ class ProfileScreen extends StatelessWidget {
           SizedBox(height: 4),
           Text(
             "Hi! I’m Alex, a software engineer from the Netherlands. "
-            "I’m heading to LA and would love to meet some locals and fellow tourists. "
-            "\n\nMy instagram is @alexlind and my linkedin is Alex Linderson.",
+                "I’m heading to LA and would love to meet some locals and fellow tourists. "
+                "\n\nMy instagram is @alexlind and my linkedin is Alex Linderson.",
             style: TextStyle(fontSize: 14, fontFamily: 'Fira Sans Condensed'),
           ),
           Divider(),

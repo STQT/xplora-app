@@ -1,78 +1,120 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../constants/auth.dart';
 import 'chat_screen.dart';
 
-class MessagesListScreen extends StatelessWidget {
-  final List<Map<String, String>> messages = [
-    {
-      "name": "Alex Linderson",
-      "message": "How are you today?",
-      "time": "2 min ago",
-      "unread": "3",
-      "image": "https://picsum.photos/150?random=1"
-    },
-    {
-      "name": "LA party 09.10",
-      "message": "Make sure to attend the meeting!",
-      "time": "2 min ago",
-      "unread": "4",
-      "image": "https://picsum.photos/150?random=2"
-    },
-    {
-      "name": "John Smith",
-      "message": "Hey! How are you doing?",
-      "time": "5 min ago",
-      "unread": "2",
-      "image": "https://picsum.photos/150?random=3"
-    },
-  ];
+class MessagesListScreen extends StatefulWidget {
+  @override
+  _MessagesListScreenState createState() => _MessagesListScreenState();
+}
+
+class _MessagesListScreenState extends State<MessagesListScreen> {
+  Future<List<dynamic>> fetchChats() async {
+    final url = 'https://xplora.robosoft.kz/api/chats/';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AuthConst.tokenKey);
+    final response = await http.get(
+      Uri.parse(url),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      List<dynamic> data = json.decode(response.body);
+      print(data);
+      return data;
+    } else {
+      throw Exception('Ошибка загрузки данных');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: messages.length,
-      itemBuilder: (context, index) {
-        final message = messages[index];
-        return InkWell(
-          onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => ChatScreen(
-                  userName: message['name']!,
-                  userImage: message['image']!,
-                ),
-              ),
-            );
-          },
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundImage: NetworkImage(message['image']!),
-            ),
-            title: Text(
-              message['name']!,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text(message['message']!),
-            trailing: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(message['time']!, style: TextStyle(fontSize: 12)),
-                if (message['unread'] != null)
-                  SizedBox(height: 5),
-                if (message['unread'] != null)
-                  CircleAvatar(
-                    radius: 12,
-                    backgroundColor: Color(0xFF77C2C8),
-                    child: Text(
-                      message['unread']!,
-                      style: TextStyle(color: Colors.white, fontSize: 12),
+    return FutureBuilder<List<dynamic>>(
+      future: fetchChats(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Center(child: CircularProgressIndicator());
+        } else if (snapshot.hasError) {
+          return Center(child: Text('Ошибка: ${snapshot.error}'));
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          return Center(child: Text('Нет сообщений'));
+        } else {
+          final chats = snapshot.data!;
+          return ListView.builder(
+            padding: EdgeInsets.all(16),
+            itemCount: chats.length,
+            itemBuilder: (context, index) {
+              final chat = chats[index];
+
+              // Проверяем наличие user_profile
+              final userProfile = chat['user_profile'];
+              String userName = "Unknown";
+              String userImage = 'https://picsum.photos/150';
+              if (userProfile != null) {
+                userName = '${userProfile['firstname'] ?? ''} ${userProfile['lastname'] ?? ''}'
+                    .trim();
+                if (userProfile['profile_img'] != null &&
+                    userProfile['profile_img'].toString().isNotEmpty) {
+                  userImage = userProfile['profile_img'];
+                }
+              }
+
+              // Обработка last_message, если оно не null
+              final lastMessage = chat['last_message'];
+              String messageText = "";
+              String timeAgo = "";
+              if (lastMessage != null) {
+                messageText = lastMessage['text'] ?? "";
+                if (lastMessage['created_at'] != null) {
+                  try {
+                    final createdAt = DateTime.parse(lastMessage['created_at']);
+                    timeAgo =
+                    '${DateTime.now().difference(createdAt).inMinutes} мин назад';
+                  } catch (e) {
+                    timeAgo = "";
+                  }
+                }
+              }
+
+              return InkWell(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                        chatId: chat['chat_id'] ?? '',
+                        userName: userName,
+                        userImage: userImage,
+                      ),
                     ),
+                  );
+                },
+                child: ListTile(
+                  leading: CircleAvatar(
+                    backgroundImage: NetworkImage(userImage),
                   ),
-              ],
-            ),
-          ),
-        );
+                  title: Text(
+                    userName,
+                    style: TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text(messageText),
+                  trailing: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(timeAgo, style: TextStyle(fontSize: 12)),
+                      // Дополнительная логика для индикатора непрочитанных сообщений
+                    ],
+                  ),
+                ),
+              );
+            },
+          );
+        }
       },
     );
   }

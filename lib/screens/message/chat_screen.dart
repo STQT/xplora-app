@@ -1,11 +1,165 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../constants/auth.dart';
 
-class ChatScreen extends StatelessWidget {
+class ChatScreen extends StatefulWidget {
+  final String chatId;
   final String userName;
   final String userImage;
 
-  ChatScreen({required this.userName, required this.userImage});
+  ChatScreen({
+    required this.chatId,
+    required this.userName,
+    required this.userImage,
+  });
+
+  @override
+  _ChatScreenState createState() => _ChatScreenState();
+}
+
+class _ChatScreenState extends State<ChatScreen> {
+  List<dynamic> messages = [];
+  String? nextPageUrl;
+  bool isLoading = false;
+  ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    fetchMessages();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels >=
+          _scrollController.position.maxScrollExtent - 200 &&
+          nextPageUrl != null &&
+          !isLoading) {
+        fetchMessages(url: nextPageUrl);
+      }
+    });
+  }
+
+  Future<void> fetchMessages({String? url}) async {
+    setState(() {
+      isLoading = true;
+    });
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AuthConst.tokenKey);
+    // Если url не задан, используем начальный endpoint с chatId
+    final requestUrl = url ??
+        'https://xplora.robosoft.kz/api/chats/${widget.chatId}/';
+    final response = await http.get(
+      Uri.parse(requestUrl),
+      headers: {
+        'Authorization': 'Bearer $token',
+        'Content-Type': 'application/json',
+      },
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      // data содержит поля count, next, previous, results
+      setState(() {
+        messages.addAll(data['results']);
+        nextPageUrl = data['next'];
+      });
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка загрузки сообщений')),
+      );
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  // Виджет сообщения, аналогичный вашему предыдущему коду
+  Widget _buildMessageBubble({
+    required String text,
+    required bool isSender,
+    required String time,
+  }) {
+    return Align(
+      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
+      child: Column(
+        crossAxisAlignment:
+        isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            margin: EdgeInsets.symmetric(vertical: 4),
+            decoration: BoxDecoration(
+              color: isSender ? Color(0xFF77C2C8) : Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Text(
+              text,
+              style: TextStyle(
+                fontSize: 14,
+                color: isSender ? Colors.white : Colors.black,
+              ),
+            ),
+          ),
+          Padding(
+            padding: EdgeInsets.only(
+                right: isSender ? 8 : 0, left: isSender ? 0 : 8),
+            child: Text(
+              time,
+              style: TextStyle(fontSize: 10, color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Простейшее поле ввода сообщения
+  Widget _buildMessageInputField() {
+    return Container(
+      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border(top: BorderSide(color: Colors.grey.shade300)),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            icon: Icon(Icons.attachment, color: Colors.black),
+            onPressed: () {},
+          ),
+          Expanded(
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(24),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 12),
+              child: TextField(
+                decoration: InputDecoration(
+                  hintText: "Write your message",
+                  border: InputBorder.none,
+                ),
+              ),
+            ),
+          ),
+          IconButton(
+            icon: Icon(Icons.camera_alt, color: Colors.black),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: Icon(Icons.mic, color: Colors.black),
+            onPressed: () {},
+          ),
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,14 +172,14 @@ class ChatScreen extends StatelessWidget {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: NetworkImage(userImage),
+              backgroundImage: NetworkImage(widget.userImage),
             ),
             SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  userName,
+                  widget.userName,
                   style: TextStyle(
                     fontFamily: 'Fira Sans Condensed',
                     fontSize: 16,
@@ -50,183 +204,37 @@ class ChatScreen extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: ListView(
+            child: ListView.builder(
+              controller: _scrollController,
               padding: EdgeInsets.all(16),
-              children: [
-                _buildDateLabel("Today"),
-                _buildMessageBubble(
-                    text: "Hey! How are you doing?",
-                    isSender: false,
-                    time: "09:25 AM"),
-                _buildMessageBubble(
-                    text: "Hello, John Smith!!!",
-                    isSender: true,
-                    time: "09:25 AM"),
-                _buildMessageBubble(
-                    text: "You did your job well!",
-                    isSender: true,
-                    time: "09:25 AM"),
-                _buildMessageBubble(
-                    text: "Have a great week!",
-                    isSender: false,
-                    time: "09:25 AM"),
-                _buildMessageBubble(
-                    text: "See you soon!", isSender: false, time: "09:25 AM"),
-                _buildVoiceMessage(time: "09:25 AM"),
-              ],
+              itemCount: messages.length + 1, // дополнительный элемент для индикатора загрузки
+              itemBuilder: (context, index) {
+                if (index == messages.length) {
+                  return isLoading
+                      ? Center(child: CircularProgressIndicator())
+                      : SizedBox.shrink();
+                }
+                final message = messages[index];
+                // Определяем, кто отправитель. Для этого можно сравнить sender_id с текущим userId.
+                // Здесь можно добавить логику получения currentUserId.
+                // В данном примере просто считаем, что все сообщения получены от собеседника.
+                final isSender = false;
+                final text = message['text'] ?? "";
+                String time = "";
+                if (message['created_at'] != null) {
+                  try {
+                    final createdAt = DateTime.parse(message['created_at']);
+                    time =
+                    '${createdAt.hour}:${createdAt.minute.toString().padLeft(2, '0')}';
+                  } catch (e) {
+                    time = "";
+                  }
+                }
+                return _buildMessageBubble(text: text, isSender: isSender, time: time);
+              },
             ),
           ),
           _buildMessageInputField(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildDateLabel(String date) {
-    return Center(
-      child: Container(
-        padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade300,
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Text(
-          date,
-          style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessageBubble(
-      {required String text, required bool isSender, required String time}) {
-    return Align(
-      alignment: isSender ? Alignment.centerRight : Alignment.centerLeft,
-      child: Column(
-        crossAxisAlignment:
-        isSender ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            margin: EdgeInsets.symmetric(vertical: 4),
-            decoration: BoxDecoration(
-              color: isSender ? Color(0xFF77C2C8) : Colors.grey.shade200,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Text(
-              text,
-              style: TextStyle(
-                fontSize: 14,
-                color: isSender ? Colors.white : Colors.black,
-              ),
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.only(right: isSender ? 8 : 0, left: isSender ? 0 : 8),
-            child: Text(
-              time,
-              style: TextStyle(fontSize: 10, color: Colors.grey),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildVoiceMessage({required String time}) {
-    return Align(
-      alignment: Alignment.centerRight,
-      child: Container(
-        padding: EdgeInsets.all(10),
-        margin: EdgeInsets.symmetric(vertical: 4),
-        decoration: BoxDecoration(
-          color: Color(0xFF77C2C8),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.play_arrow, color: Colors.white, size: 28),
-            SizedBox(width: 8),
-            Container(
-              width: 100,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.white70,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            SizedBox(width: 8),
-            Text(
-              "00:16",
-              style: TextStyle(fontSize: 12, color: Colors.white),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildMessageInputField() {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade300)),
-      ),
-      child: Row(
-        children: [
-          IconButton(
-            icon: SvgPicture.asset("assets/icons/attachment.svg",
-                width: 22, height: 22, color: Colors.black),
-            onPressed: () {},
-          ),
-          Expanded(
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.grey.shade200,
-                borderRadius: BorderRadius.circular(24),
-              ),
-              padding: EdgeInsets.symmetric(horizontal: 12),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Write your message",
-                        hintStyle: TextStyle(
-                          fontFamily: 'Fira Sans Condensed', // Указан шрифт
-                          fontSize: 14, // Размер шрифта
-                          color: Colors.grey, // Цвет текста
-                        ),
-                        border: InputBorder.none, // Убираем стандартную границу
-                      ),
-                      style: TextStyle(
-                        fontFamily: 'Fira Sans Condensed', // Применение шрифта к тексту
-                        fontSize: 16, // Размер шрифта для ввода текста
-                        color: Colors.black, // Цвет вводимого текста
-                      ),
-                    ),
-                  ),
-                  IconButton(
-                    icon: SvgPicture.asset("assets/icons/sticker.svg",
-                        width: 20, height: 20, color: Colors.black),
-                    onPressed: () {},
-                  ),
-                ],
-              ),
-            ),
-          ),
-          IconButton(
-            icon: SvgPicture.asset("assets/icons/camera.svg",
-                width: 24, height: 24, color: Colors.black),
-            onPressed: () {},
-          ),
-          IconButton(
-            icon: SvgPicture.asset("assets/icons/mic.svg",
-                width: 24, height: 24, color: Colors.black),
-            onPressed: () {},
-          ),
         ],
       ),
     );

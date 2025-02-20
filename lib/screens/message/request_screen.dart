@@ -1,18 +1,85 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
 import 'package:discoveria/components/bottom_nav_bar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class RequestScreen extends StatelessWidget {
+import '../../constants/auth.dart';
+
+class RequestScreen extends StatefulWidget {
+  final String userId;
   final String userName;
   final String userImage;
   final String requestMessage;
   final String requestTime;
 
   RequestScreen({
+    required this.userId,
     required this.userName,
     required this.userImage,
     required this.requestMessage,
     required this.requestTime,
   });
+
+  @override
+  _RequestScreenState createState() => _RequestScreenState();
+}
+
+class _RequestScreenState extends State<RequestScreen> {
+  bool _isLoading = false;
+
+  Future<void> _updateRequestStatus(String status) async {
+    setState(() {
+      _isLoading = true;
+    });
+
+    final url = 'https://xplora.robosoft.kz/api/user-requests/';
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString(AuthConst.tokenKey);
+    try {
+      final response = await http.put(
+        Uri.parse(url),
+
+        headers: {
+          'Authorization': 'Bearer $token', // замените на реальный токен
+          'Content-Type': 'application/json',
+        },
+        body: json.encode({
+          "user_id": widget.userId,
+          "status": status,
+        }),
+      );
+      print(widget.userId);
+      print(response.body);
+
+      if (response.statusCode == 200 || response.statusCode == 204) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Запрос успешно обновлён')),
+        );
+        Navigator.pop(context);
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Ошибка при обновлении запроса')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Ошибка: $e')),
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  void _approve() {
+    _updateRequestStatus("approve");
+  }
+
+  void _deny() {
+    _updateRequestStatus("deny");
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +101,9 @@ class RequestScreen extends StatelessWidget {
         backgroundColor: Colors.white,
         elevation: 0,
       ),
-      body: Padding(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator())
+          : Padding(
         padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -42,7 +111,7 @@ class RequestScreen extends StatelessWidget {
             Row(
               children: [
                 CircleAvatar(
-                  backgroundImage: NetworkImage(userImage),
+                  backgroundImage: NetworkImage(widget.userImage),
                   radius: 28,
                 ),
                 SizedBox(width: 12),
@@ -50,7 +119,7 @@ class RequestScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      userName,
+                      widget.userName,
                       style: TextStyle(
                         fontFamily: 'Fira Sans Condensed',
                         fontSize: 16,
@@ -58,7 +127,7 @@ class RequestScreen extends StatelessWidget {
                       ),
                     ),
                     Text(
-                      requestTime,
+                      widget.requestTime,
                       style: TextStyle(fontSize: 12, color: Colors.grey),
                     ),
                   ],
@@ -77,7 +146,7 @@ class RequestScreen extends StatelessWidget {
             ),
             SizedBox(height: 8),
             Text(
-              requestMessage,
+              widget.requestMessage,
               style: TextStyle(
                 fontFamily: 'Fira Sans Condensed',
                 fontSize: 14,
@@ -89,9 +158,7 @@ class RequestScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Логика отклонения
-                    },
+                    onPressed: _deny,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.redAccent,
                       padding: EdgeInsets.symmetric(vertical: 14),
@@ -113,9 +180,7 @@ class RequestScreen extends StatelessWidget {
                 SizedBox(width: 12),
                 Expanded(
                   child: ElevatedButton(
-                    onPressed: () {
-                      // Логика принятия
-                    },
+                    onPressed: _approve,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFF77C2C8),
                       padding: EdgeInsets.symmetric(vertical: 14),
