@@ -149,7 +149,33 @@ class _CompleteProfileStep2State extends State<CompleteProfileStep2> {
                   SubmitButton(
                     text: "Complete form",
                     isEnabled: isFormValid,
-                    onPressed: isFormValid ? () => Navigator.pushNamed(context, '/step3') : null,
+                    onPressed: isFormValid
+                        ? () {
+                      final provider = Provider.of<ProfileProvider>(context, listen: false);
+
+                      // Получаем ID интересов и языков
+                      List<int> interestIds = selectedInterests
+                          .map((name) => provider.interests.indexOf(name) + 1)
+                          .toList();
+
+                      List<int> languageIds = selectedLanguages
+                          .map((name) => provider.languages.indexOf(name) + 1)
+                          .toList();
+
+                      // Сохраняем данные в провайдере
+                      provider.updateProfileStep2(
+                        interests: interestIds.map((id) => id.toString()).toList(),
+                        languages: languageIds.map((id) => id.toString()).toList(),
+                      );
+
+                      if (_selectedImage != null) {
+                        provider.updateProfileImage(_selectedImage!);
+                      }
+
+                      // Переход на следующий шаг
+                      Navigator.pushNamed(context, '/step3');
+                    }
+                        : null,
                   ),
                   SizedBox(height: 16),
 

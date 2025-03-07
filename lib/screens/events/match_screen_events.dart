@@ -7,6 +7,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:discoveria/screens/events/create_event.dart';
 import 'package:discoveria/screens/events/request_screen.dart';
 
+import '../../constants/auth.dart';
+
 class Event {
   final String id;
   final String title;
@@ -73,7 +75,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
 
     // Получаем токен из shared_preferences (если он используется)
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = prefs.getString(AuthConst.tokenKey);
 
     try {
       final response = await http.get(
@@ -342,7 +344,7 @@ class _MatchScreenEventsState extends State<MatchScreenEvents> {
                         ),
                       ),
                       Text(
-                        "Edit your events",
+                        "My events",
                         style: TextStyle(
                           fontFamily: 'Fira Sans Condensed',
                           fontWeight: FontWeight.w600,

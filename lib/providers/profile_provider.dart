@@ -7,6 +7,7 @@ import 'package:path/path.dart' as path;
 
 import 'package:http/http.dart' as http;
 
+import '../constants/auth.dart';
 
 class ProfileProvider extends ChangeNotifier {
   // Step 1 (Basic Info)
@@ -195,7 +196,7 @@ class ProfileProvider extends ChangeNotifier {
 
     try {
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      String? token = prefs.getString('auth_token');
+      String? token = prefs.getString(AuthConst.tokenKey);
 
       if (token == null) {
         print("Error: No auth token found!");
@@ -207,7 +208,6 @@ class ProfileProvider extends ChangeNotifier {
         "POST",
         Uri.parse("https://xplora.robosoft.kz/api/users/profiles/"),
       );
-
       // Добавляем заголовок авторизации
       request.headers["Authorization"] = "Bearer $token";
 
@@ -217,22 +217,25 @@ class ProfileProvider extends ChangeNotifier {
       request.fields["gender"] = _gender?.toLowerCase() ?? "";
       request.fields["birth_date"] = _formatDate(_dob);
       request.fields["bio"] = "This is my bio"; // Убедитесь, что bio не пустой
+      // Форматируем interest_ids и language_ids
       request.fields["interest_ids"] = _selectedInterests.isNotEmpty
-          ? _selectedInterests.join(",")
+          ? _selectedInterests.join(",") // Преобразуем список в строку "1,2,4"
           : "1";
       request.fields["language_ids"] = _selectedLanguages.isNotEmpty
-          ? _selectedLanguages.join(",")
+          ? _selectedLanguages.join(",") // Преобразуем список в строку "1,2,4"
           : "1";
+
       request.fields["city_id"] = (_selectedCityId ?? 1).toString();
       request.fields["date_start"] = _formatDate(_fromDate);
       request.fields["date_end"] = _formatDate(_toDate);
+
 
       // Если изображение выбрано, добавляем его в запрос как файл
       if (_profileImage != null) {
         var stream = http.ByteStream(_profileImage!.openRead());
         var length = await _profileImage!.length();
         var multipartFile = http.MultipartFile(
-          "profile_img", // имя поля должно совпадать с ожидаемым на сервере
+          "profile_img", // Должно соответствовать API
           stream,
           length,
           filename: path.basename(_profileImage!.path),
@@ -243,10 +246,12 @@ class ProfileProvider extends ChangeNotifier {
       // Отправляем запрос
       var response = await request.send();
 
+      // Читаем ответ
+      String responseData = await response.stream.bytesToString();
+
       if (response.statusCode == 201 || response.statusCode == 200) {
         print("Profile successfully created!");
       } else {
-        String responseData = await response.stream.bytesToString();
         print("Error saving profile: $responseData");
       }
     } catch (error) {
