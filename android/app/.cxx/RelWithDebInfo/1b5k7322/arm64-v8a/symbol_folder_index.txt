@@ -1,0 +1,1 @@
+/Users/macbookpro/IdeaProjects/discoveria/build/app/intermediates/cxx/RelWithDebInfo/1b5k7322/obj/arm64-v8a

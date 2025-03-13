@@ -1,0 +1,2 @@
+/Users/macbookpro/IdeaProjects/discoveria/android/app/.cxx/RelWithDebInfo/1b5k7322/armeabi-v7a/CMakeFiles/edit_cache.dir
+/Users/macbookpro/IdeaProjects/discoveria/android/app/.cxx/RelWithDebInfo/1b5k7322/armeabi-v7a/CMakeFiles/rebuild_cache.dir
