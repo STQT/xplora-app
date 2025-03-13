@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/login_provider.dart';
+import '../services/user_service.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -37,7 +38,13 @@ class _LoginScreenState extends State<LoginScreen> {
     );
 
     if (success) {
-      Navigator.pushReplacementNamed(context, '/step1');
+      final userProfile = await UserService.getUserProfile();
+
+      if (userProfile != null && userProfile['profile'] != null) {
+        Navigator.pushReplacementNamed(context, '/match'); // Redirect to MatchScreen
+      } else {
+        Navigator.pushReplacementNamed(context, '/step1'); // Redirect to Profile Setup
+      }
     } else {
       setState(() {
         errorMessage = provider.errorMessage;
