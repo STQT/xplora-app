@@ -18,16 +18,15 @@ class Profile {
   final String bio;
   final String userId;
 
-  Profile({
-    required this.userId,
-    required this.name,
-    required this.age,
-    required this.location,
-    required this.image,
-    required this.interests,
-    required this.languages,
-    required this.bio
-  });
+  Profile(
+      {required this.userId,
+      required this.name,
+      required this.age,
+      required this.location,
+      required this.image,
+      required this.interests,
+      required this.languages,
+      required this.bio});
 
   factory Profile.fromJson(Map<String, dynamic> json) {
     // Пример преобразования: используем firstname как name, можно допилить расчет возраста и location
@@ -58,7 +57,8 @@ class MatchScreenPeople extends StatefulWidget {
 class _MatchScreenPeopleState extends State<MatchScreenPeople>
     with SingleTickerProviderStateMixin {
   List<Profile> profiles = [];
-  String? nextPageUrl = 'https://xplora.robosoft.kz/api/users/profiles/';
+  String? nextPageUrl =
+      'https://xplora.robosoft.kz/api/users/profiles/?limit=1';
   bool isLoading = false;
 
   late AnimationController _animationController;
@@ -90,36 +90,58 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
 
   // Функция для загрузки данных с API с учетом пагинации
   Future<void> _loadProfiles() async {
-    if (nextPageUrl == null || isLoading) return;
+    if (isLoading) {
+      print("🔄 Загрузка уже идет, пропускаем...");
+      return;
+    }
+
     setState(() {
       isLoading = true;
     });
+
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(AuthConst.tokenKey);
+
+    if (token == null) {
+      print("❌ Ошибка: Токен не найден в SharedPreferences.");
+      setState(() => isLoading = false);
+      return;
+    }
+
+    print("📡 Отправляем запрос на загрузку профиля...");
+
     try {
+      final url = 'https://xplora.robosoft.kz/api/users/profiles/?limit=1';
       final response = await http.get(
-        Uri.parse(nextPageUrl!),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
       );
+
+      print("✅ Ответ от сервера (${response.statusCode}): ${response.body}");
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         List<dynamic> results = data['results'] ?? [];
-        List<Profile> loadedProfiles =
-        results.map((json) => Profile.fromJson(json)).toList();
+
         setState(() {
-          profiles.addAll(loadedProfiles);
-          nextPageUrl = data['next']; // если next == null, пагинация закончилась
+          profiles.clear(); // Очистка списка
+          if (results.isNotEmpty) {
+            profiles.add(Profile.fromJson(results.first));
+            print("🆕 Загружен новый профиль: ${profiles.first.name}");
+          } else {
+            print("⚠️ Нет новых профилей.");
+          }
         });
-        print(loadedProfiles);
       } else {
-        print('Ошибка: ${response.statusCode}');
+        print('❌ Ошибка загрузки профилей: ${response.statusCode}');
       }
     } catch (e) {
-      print('Ошибка загрузки профилей: $e');
+      print('❌ Ошибка сети: $e');
     }
+
     setState(() {
       isLoading = false;
     });
@@ -128,25 +150,42 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
   Future<void> _sendSwipeRequest(Profile profile, String status) async {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString(AuthConst.tokenKey);
+
+    if (token == null) {
+      print("❌ Ошибка: Токен не найден в SharedPreferences.");
+      return;
+    }
+
+    final url = 'https://xplora.robosoft.kz/api/user-requests/';
+    final body = jsonEncode({
+      "user_id": profile.userId,
+      "status": status,
+    });
+
+    print(
+        "📡 Отправляем запрос на свайп ($status) для пользователя: ${profile.name}");
+    print("➡️ URL: $url");
+    print("📤 Тело запроса: $body");
+
     try {
       final response = await http.post(
-        Uri.parse('https://xplora.robosoft.kz/api/user-requests/'),
+        Uri.parse(url),
         headers: {
           'Authorization': 'Bearer $token',
           'Content-Type': 'application/json',
         },
-        body: jsonEncode({
-          "user_id": profile.userId, // убедитесь, что profile содержит поле user_id
-          "status": status,
-        }),
+        body: body,
       );
+
+      print("✅ Ответ от сервера (${response.statusCode}): ${response.body}");
+
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print("Запрос с статусом '$status' для ${profile.name} отправлен успешно.");
+        print("🎉 Запрос отправлен успешно!");
       } else {
-        print("Ошибка при отправке запроса: ${response.statusCode}");
+        print("❌ Ошибка при отправке запроса: ${response.statusCode}");
       }
     } catch (e) {
-      print("Ошибка сети: $e");
+      print("❌ Ошибка сети: $e");
     }
   }
 
@@ -334,26 +373,36 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
               ],
             );
           },
-          onSwipe: (int index, int? previousIndex, CardSwiperDirection direction) {
+          onSwipe:
+              (int index, int? previousIndex, CardSwiperDirection direction) {
+            if (profiles.isEmpty) return false;
+
+            final profile = profiles[0];
+            final status =
+                direction == CardSwiperDirection.right ? "wait" : "deny";
+
+            print(
+                "💨 Свайп ${direction == CardSwiperDirection.right ? "➡️ ЛАЙК" : "❌ ДИЗЛАЙК"} для ${profile.name}");
+
             setState(() {
-              currentIndex = index;
               _lastSwipeDirection = direction;
             });
+
             Future.delayed(Duration(milliseconds: 500), () {
               setState(() {
                 _lastSwipeDirection = null;
               });
             });
 
-            // Вызываем соответствующий запрос в зависимости от направления свайпа
-            if (direction == CardSwiperDirection.right) {
-              print("Liked ${profiles[index].name}");
-              _sendSwipeRequest(profiles[index], "wait");
-            } else if (direction == CardSwiperDirection.left) {
-              print("Disliked ${profiles[index].name}");
-              _sendSwipeRequest(profiles[index], "deny");
-            }
-            return true;
+            _sendSwipeRequest(profile, status).then((_) {
+              setState(() {
+                profiles.clear();
+                isLoading = false; // <---- Добавлено! Сбрасываем блокировку
+              });
+              _loadProfiles(); // Загружаем новый профиль
+            });
+
+            return true; // Подтверждаем свайп
           },
           padding: EdgeInsets.all(16),
           scale: 0.9,
