@@ -200,14 +200,6 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
     });
   }
 
-  // Функция, которая проверяет, нужно ли подгружать следующую страницу,
-  // например, когда пользователь дойдет до предпоследней карточки
-  void _checkPagination(int index) {
-    if (index >= profiles.length - 2 && nextPageUrl != null) {
-      _loadProfiles();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     // Если профили ещё не загружены, можно показать индикатор загрузки
@@ -303,7 +295,6 @@ class _MatchScreenPeopleState extends State<MatchScreenPeople>
           numberOfCardsDisplayed: 1,
           cardBuilder: (BuildContext context, int index, int _, int __) {
             // Проверяем пагинацию
-            _checkPagination(index);
             final profile = profiles[index];
             return Stack(
               children: [
